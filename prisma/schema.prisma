@@ -1,0 +1,154 @@
+generator client {
+    provider        = "prisma-client-js"
+    previewFeatures = ["uncheckedScalarInputs"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    email     String   @unique
+    firstName String
+    lastName  String
+    password  String
+    status    Boolean  @default(true)
+    locked    Boolean  @default(false)
+    role      Role     @default(USER)
+    public    Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    trips      Trip[]
+    favorites  Favorite[]
+    activities UsersToActivities[]
+}
+
+model Trip {
+    id            Int      @id @default(autoincrement())
+    uuid          String   @default(uuid())
+    userId        Int?
+    name          String
+    description   String?
+    public        Boolean
+    dateFrom      DateTime
+    dateTo        DateTime
+    adults        Int
+    children      Int?     @default(0)
+    infants       Int?     @default(0)
+    backgroundUrl String?
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    user         User?         @relation(fields: [userId], references: [id])
+    favorites    Favorite[]
+    activities   Activity[]
+    locations    Location[]
+    preparations Preparation[]
+
+    @@unique([userId, id])
+}
+
+model Activity {
+    id                   Int      @id @default(autoincrement())
+    uuid                 String   @default(uuid())
+    tripId               Int?
+    activityTypeId       Int
+    transportationTypeId Int
+    name                 String
+    description          String?
+    location             String
+    date                 DateTime
+    timezone             String
+    public               Boolean
+    maxPeople            Int?     @default(0)
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
+
+    trip               Trip?               @relation(fields: [tripId], references: [id])
+    activityType       ActivityType        @relation(fields: [activityTypeId], references: [id])
+    transportationType TransportationType  @relation(fields: [transportationTypeId], references: [id])
+    users              UsersToActivities[]
+
+    @@unique([tripId, id])
+}
+
+model ActivityType {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    name      String
+    type      String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    activities Activity[]
+}
+
+model TransportationType {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    name      String
+    type      String   @unique
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    activities Activity[]
+}
+
+model Location {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    tripId    Int?
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    trip Trip? @relation(fields: [tripId], references: [id])
+}
+
+model Preparation {
+    id          Int      @id @default(autoincrement())
+    uuid        String   @default(uuid())
+    tripId      Int?
+    name        String
+    description String?
+    status      Boolean
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    trip Trip? @relation(fields: [tripId], references: [id])
+}
+
+model Favorite {
+    id        Int      @id @default(autoincrement())
+    uuid      String   @default(uuid())
+    userId    Int?
+    tripId    Int?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User? @relation(fields: [userId], references: [id])
+    trip Trip? @relation(fields: [tripId], references: [id])
+
+    @@unique([userId, tripId])
+}
+
+model UsersToActivities {
+    userId     Int
+    activityId Int
+    createdAt  DateTime @default(now())
+
+    user     User     @relation(fields: [userId], references: [id])
+    activity Activity @relation(fields: [activityId], references: [id])
+
+    @@id([userId, activityId])
+    @@unique([userId, activityId])
+}
+
+enum Role {
+    USER
+    ADMIN
+}
