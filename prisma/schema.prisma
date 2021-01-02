@@ -115,7 +115,7 @@ model Preparation {
     tripId      Int?
     name        String
     description String?
-    status      Boolean
+    status      Boolean? @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 

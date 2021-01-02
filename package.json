@@ -59,7 +59,7 @@
 		"build": "npm run clean && npm run generate && tsc",
 		"generate": "prisma generate",
 		"dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --no-notify src/server.ts",
-		"migrate": "prisma migrate save --name migration --experimental && prisma migrate up --experimental",
+		"migrate": "prisma migrate dev --preview-feature",
 		"reinstall": "rm -rf node_modules && rm -rf package-lock.json && npm install"
 	},
 	"keywords": [],

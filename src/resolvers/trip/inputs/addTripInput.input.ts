@@ -68,11 +68,11 @@ export class AddTripInput {
 	adults!: number;
 
 	@Field(type => Int, { nullable: true })
-	@IsPositive()
+	@Min(0)
 	children?: number;
 
 	@Field(type => Int, { nullable: true })
-	@IsPositive()
+	@Min(0)
 	infants?: number;
 
 	@Field({ nullable: true })

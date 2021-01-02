@@ -53,11 +53,18 @@ export const formatError = (err: GraphQLError): any => {
 };
 
 export const findUserByEmail = async (prisma: PrismaClient, email: string) => {
+	// try {
 	const user = await prisma.user.findUnique({
-		where: { email: email.toLowerCase() }
+		where: {
+			email: email.toLowerCase()
+		}
 	});
 
 	return user;
+	// } catch (error) {
+	// 	throw Error('dadadad');
+	// 	// TODO: catch all prisms query and return message
+	// }
 };
 
 export const setCurrentUser = (req: IRequest, user: User) => {

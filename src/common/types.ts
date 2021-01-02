@@ -49,6 +49,7 @@ export interface SignUpUser {
 	status?: boolean;
 	locked?: boolean;
 	role?: Role;
+	public?: boolean;
 }
 
 export interface EditUser {

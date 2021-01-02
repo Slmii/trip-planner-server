@@ -12,7 +12,7 @@ export class AddPreparationInput {
 	@Field({ nullable: true })
 	description?: string;
 
-	@Field()
+	@Field({ nullable: true })
 	@IsBoolean()
-	status!: boolean;
+	status?: boolean;
 }

@@ -55,7 +55,7 @@ export const UserService = {
 			take: pagination?.take
 		});
 	},
-	add: async ({ email, firstName, lastName, password, status, locked, role }: SignUpUser) => {
+	add: async ({ email, firstName, lastName, password, status, locked, role, public: publicUser }: SignUpUser) => {
 		const user = await helpers.findUserByEmail(prisma, email);
 
 		if (user) {
@@ -70,7 +70,8 @@ export const UserService = {
 				password: await helpers.hashPassword(password),
 				status,
 				locked,
-				role
+				role,
+				public: publicUser
 			}
 		});
 
