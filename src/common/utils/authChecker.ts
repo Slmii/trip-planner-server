@@ -6,7 +6,7 @@ import { helpers } from './index';
 export const authChecker: AuthChecker<Context> = ({ context: { req } }, roles) => {
 	const user = helpers.getCurrentUser(req);
 
-	// If `@Authorized()`, check only is user exist
+	// If `@Authorized()` without roles then check only is user exist
 	if (!roles.length) {
 		return user !== undefined;
 	}

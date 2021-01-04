@@ -67,7 +67,7 @@ const bootstrap = async () => {
 				httpOnly: true,
 				sameSite: 'lax', // csrf
 				secure: constants.IS_PRODUCTION,
-				domain: constants.IS_PRODUCTION ? '.tipstogo.com' : undefined
+				domain: constants.IS_PRODUCTION ? '.tripstogo.com' : undefined
 			},
 			saveUninitialized: false,
 			resave: false
