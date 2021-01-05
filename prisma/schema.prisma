@@ -22,10 +22,11 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    trips         Trip[]
-    favorites     Favorite[]
-    activities    UsersToActivities[]
-    notifications Notification[]
+    trips                 Trip[]
+    favorites             Favorite[]
+    activities            UsersToActivities[]
+    notificationsReceiver Notification[]      @relation("receiver")
+    notificationsSender   Notification[]      @relation("sender")
 }
 
 model Trip {
@@ -74,6 +75,7 @@ model Activity {
     transportationType  TransportationType   @relation(fields: [transportationTypeId], references: [id])
     users               UsersToActivities[]
     activityInvitations ActivityInvitation[]
+    notifications       Notification[]
 
     @@unique([tripId, id])
 }
@@ -167,15 +169,19 @@ model Favorite {
 }
 
 model Notification {
-    id        Int              @id @default(autoincrement())
-    uuid      String           @default(uuid())
-    userId    Int?
-    type      NotificationType
-    read      Boolean          @default(false)
-    createdAt DateTime         @default(now())
-    updatedAt DateTime         @updatedAt
+    id             Int              @id @default(autoincrement())
+    uuid           String           @default(uuid())
+    receiverUserId Int?
+    senderUserId   Int?
+    activityId     Int?
+    type           NotificationType
+    read           Boolean          @default(false)
+    createdAt      DateTime         @default(now())
+    updatedAt      DateTime         @updatedAt
 
-    user User? @relation(fields: [userId], references: [id])
+    receiver User?     @relation("receiver", fields: [receiverUserId], references: [id])
+    sender   User?     @relation("sender", fields: [senderUserId], references: [id])
+    activity Activity? @relation(fields: [activityId], references: [id])
 }
 
 model UsersToActivities {
@@ -196,7 +202,7 @@ enum Role {
 }
 
 enum NotificationType {
-    ACTIVITY_INVITATION
+    ACTIVITY_INVITATION_RECEIVED
     ACTIVITY_JOIN_REQUEST
     UPCOMING_TRIP
     UPCOMING_ACTIVITY

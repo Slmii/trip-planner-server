@@ -67,6 +67,14 @@ export class ActivityResolver {
 		return ActivityService.getTripActivities(tripId);
 	}
 
+	@Authorized()
+	@Query(returns => [Activity], {
+		description: 'Fetch a list of publicly available Activities'
+	})
+	publicActivities() {
+		return ActivityService.getPublicActivities();
+	}
+
 	/*
 	 * End Queries
 	 */

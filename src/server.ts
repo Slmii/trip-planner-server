@@ -23,6 +23,7 @@ import { PreparationResolver } from './resolvers/preparation/preparation.resolve
 import { SubPreparationResolver } from './resolvers/subPreparation/subPreparation.resolver';
 import { TransportationTypeResolver } from './resolvers/transportationType/transportationType.resolver';
 import { ActivityTypeResolver } from './resolvers/activityType/activityType.resolver';
+import { NotificationResolver } from './resolvers/notification/notification.resolver';
 
 import { createTripLoader } from './resolvers/trip';
 import { createLocationLoader } from './resolvers/location';
@@ -87,7 +88,8 @@ const bootstrap = async () => {
 			PreparationResolver,
 			SubPreparationResolver,
 			TransportationTypeResolver,
-			ActivityTypeResolver
+			ActivityTypeResolver,
+			NotificationResolver
 		],
 		globalMiddlewares: [ErrorInterceptor],
 		authChecker,

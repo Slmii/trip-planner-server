@@ -67,6 +67,16 @@ export const findUserByEmail = async (prisma: PrismaClient, email: string) => {
 	// }
 };
 
+export const findUserById = async (prisma: PrismaClient, id: number) => {
+	const user = await prisma.user.findUnique({
+		where: {
+			id
+		}
+	});
+
+	return user;
+};
+
 export const setCurrentUser = (req: IRequest, user: User) => {
 	req.session.user = {
 		userId: user.id,

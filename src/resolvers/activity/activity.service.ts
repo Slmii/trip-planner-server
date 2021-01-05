@@ -27,6 +27,8 @@ export const addUserToActivity = (activityId: number, userId: number) => {
 	});
 };
 
+// Get current user's public and private activities when viewing a trip.
+// Needs to have a check if current user is creator.
 export const getUserTripAcitivites = (tripId: number, userId: number) => {
 	return prisma.activity.findMany({
 		where: {
@@ -41,10 +43,34 @@ export const getUserTripAcitivites = (tripId: number, userId: number) => {
 	});
 };
 
+// Get publicly available activities when viewing a trip.
+// Does not need a check if current user is creator.
 export const getTripActivities = (tripId: number) => {
 	return prisma.activity.findMany({
 		where: {
 			tripId,
+			public: true
+		}
+	});
+};
+
+// Get public activity.
+// Does not need a check if current user is creator.
+export const getPublicActivity = (activityId: number) => {
+	return prisma.activity.findFirst({
+		where: {
+			id: activityId,
+			public: true
+		}
+	});
+};
+
+// Get all public activities.
+// Does not need a check if current user is creator.
+export const getPublicActivities = () => {
+	// TODO: implement filters.
+	return prisma.activity.findMany({
+		where: {
 			public: true
 		}
 	});
