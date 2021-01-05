@@ -10,7 +10,11 @@ export const getOne = (activityTypeId: number) => {
 };
 
 export const getActivityTypes = () => {
-	return prisma.activityType.findMany();
+	return prisma.activityType.findMany({
+		orderBy: {
+			name: 'asc'
+		}
+	});
 };
 
 export const add = (data: AddActivityTypeInput) => {

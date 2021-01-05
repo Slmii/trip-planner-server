@@ -22,9 +22,10 @@ model User {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    trips      Trip[]
-    favorites  Favorite[]
-    activities UsersToActivities[]
+    trips         Trip[]
+    favorites     Favorite[]
+    activities    UsersToActivities[]
+    notifications Notification[]
 }
 
 model Trip {
@@ -68,12 +69,29 @@ model Activity {
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 
-    trip               Trip?               @relation(fields: [tripId], references: [id])
-    activityType       ActivityType        @relation(fields: [activityTypeId], references: [id])
-    transportationType TransportationType  @relation(fields: [transportationTypeId], references: [id])
-    users              UsersToActivities[]
+    trip                Trip?                @relation(fields: [tripId], references: [id])
+    activityType        ActivityType         @relation(fields: [activityTypeId], references: [id])
+    transportationType  TransportationType   @relation(fields: [transportationTypeId], references: [id])
+    users               UsersToActivities[]
+    activityInvitations ActivityInvitation[]
 
     @@unique([tripId, id])
+}
+
+model ActivityInvitation {
+    id         Int                      @id @default(autoincrement())
+    uuid       String                   @default(uuid())
+    activityId Int?
+    email      String
+    token      String
+    status     ActivityInvitationStatus @default(PENDING)
+    expiresAt  DateTime
+    createdAt  DateTime                 @default(now())
+    updatedAt  DateTime                 @updatedAt
+
+    activity Activity? @relation(fields: [activityId], references: [id])
+
+    @@unique([email, token, id])
 }
 
 model ActivityType {
@@ -115,11 +133,23 @@ model Preparation {
     tripId      Int?
     name        String
     description String?
-    status      Boolean? @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    trip Trip? @relation(fields: [tripId], references: [id])
+    trip            Trip?            @relation(fields: [tripId], references: [id])
+    subPreparations SubPreparation[]
+}
+
+model SubPreparation {
+    id            Int      @id @default(autoincrement())
+    uuid          String   @default(uuid())
+    preparationId Int?
+    name          String
+    status        Boolean? @default(false)
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
+
+    preparation Preparation? @relation(fields: [preparationId], references: [id])
 }
 
 model Favorite {
@@ -134,6 +164,18 @@ model Favorite {
     trip Trip? @relation(fields: [tripId], references: [id])
 
     @@unique([userId, tripId])
+}
+
+model Notification {
+    id        Int              @id @default(autoincrement())
+    uuid      String           @default(uuid())
+    userId    Int?
+    type      NotificationType
+    read      Boolean          @default(false)
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+
+    user User? @relation(fields: [userId], references: [id])
 }
 
 model UsersToActivities {
@@ -151,4 +193,17 @@ model UsersToActivities {
 enum Role {
     USER
     ADMIN
+}
+
+enum NotificationType {
+    ACTIVITY_INVITATION
+    ACTIVITY_JOIN_REQUEST
+    UPCOMING_TRIP
+    UPCOMING_ACTIVITY
+}
+
+enum ActivityInvitationStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
 }

@@ -47,23 +47,3 @@ export const deleteManyByTripId = (tripId: number, userId: number) => {
 		}
 	});
 };
-
-export const editPreparationStatus = async (preparationId: number, userId: number) => {
-	const preparation = await prisma.preparation.findFirst({
-		where: {
-			id: preparationId,
-			trip: {
-				userId
-			}
-		}
-	});
-
-	return prisma.preparation.update({
-		data: {
-			status: !preparation?.status
-		},
-		where: {
-			id: preparation?.id ?? 0
-		}
-	});
-};

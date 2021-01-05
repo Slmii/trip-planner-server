@@ -38,12 +38,6 @@ export class PreparationResolver {
 
 	@Authorized()
 	@Mutation(type => Preparation)
-	editPreparationStatus(@Arg('preparationId', type => Int) preparationId: number, @User() { userId }: CurrentUser) {
-		return PreparationService.editPreparationStatus(preparationId, userId);
-	}
-
-	@Authorized()
-	@Mutation(type => Preparation)
 	deletePreparation(@Arg('preparationId', type => Int) preparationId: number, @User() { userId }: CurrentUser) {
 		return PreparationService.deleteOne(preparationId, userId);
 	}

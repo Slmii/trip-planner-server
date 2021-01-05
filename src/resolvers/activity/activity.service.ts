@@ -34,6 +34,9 @@ export const getUserTripAcitivites = (tripId: number, userId: number) => {
 				id: tripId,
 				userId
 			}
+		},
+		orderBy: {
+			date: 'asc'
 		}
 	});
 };

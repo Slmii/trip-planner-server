@@ -32,6 +32,16 @@ export const add = (params: { userId: number; data: AddTripInput }) => {
 		})
 	);
 
+	const createPreparations: Prisma.PreparationCreateWithoutTripInput[] | undefined = preparations?.map(
+		({ name, description, subPreparations }) => ({
+			name,
+			description,
+			subPreparations: {
+				create: subPreparations
+			}
+		})
+	);
+
 	return prisma.trip.create({
 		data: {
 			...trip,
@@ -43,7 +53,7 @@ export const add = (params: { userId: number; data: AddTripInput }) => {
 				create: createActivities
 			},
 			preparations: {
-				create: preparations
+				create: createPreparations
 			}
 		}
 	});

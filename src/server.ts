@@ -20,6 +20,7 @@ import { TripResolver } from './resolvers/trip/trip.resolver';
 import { LocationResolver } from './resolvers/location/location.resolver';
 import { ActivityResolver } from './resolvers/activity/activity.resolver';
 import { PreparationResolver } from './resolvers/preparation/preparation.resolver';
+import { SubPreparationResolver } from './resolvers/subPreparation/subPreparation.resolver';
 import { TransportationTypeResolver } from './resolvers/transportationType/transportationType.resolver';
 import { ActivityTypeResolver } from './resolvers/activityType/activityType.resolver';
 
@@ -84,6 +85,7 @@ const bootstrap = async () => {
 			FavoriteResolver,
 			ActivityResolver,
 			PreparationResolver,
+			SubPreparationResolver,
 			TransportationTypeResolver,
 			ActivityTypeResolver
 		],

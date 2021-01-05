@@ -11,6 +11,9 @@ export const createPreparationLoader = () =>
 					in: tripIds as number[]
 				}
 			},
+			include: {
+				subPreparations: true
+			},
 			orderBy: {
 				id: 'asc'
 			}

@@ -10,7 +10,11 @@ export const getOne = (transportationTypeId: number) => {
 };
 
 export const getTransporationTypes = () => {
-	return prisma.transportationType.findMany();
+	return prisma.transportationType.findMany({
+		orderBy: {
+			name: 'asc'
+		}
+	});
 };
 
 export const add = (data: AddTransportationTypeInput) => {

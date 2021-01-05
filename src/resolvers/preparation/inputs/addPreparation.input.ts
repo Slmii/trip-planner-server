@@ -1,5 +1,7 @@
-import { IsNotEmpty, IsBoolean } from 'class-validator';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
+
+import { AddSubPreparationInput } from '../../subPreparation/inputs';
 
 @InputType()
 export class AddPreparationInput {
@@ -12,7 +14,7 @@ export class AddPreparationInput {
 	@Field({ nullable: true })
 	description?: string;
 
-	@Field({ nullable: true })
-	@IsBoolean()
-	status?: boolean;
+	@Field(type => [AddSubPreparationInput])
+	@ValidateNested()
+	subPreparations?: AddSubPreparationInput[];
 }
