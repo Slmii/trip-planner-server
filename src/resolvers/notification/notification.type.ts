@@ -22,8 +22,11 @@ export class Notification extends DefaultTypes {
 	@Field()
 	read!: boolean;
 
+	// @Field(type => User, { nullable: true })
+	// receiver?: User;
+
 	@Field(type => User, { nullable: true })
-	user?: User;
+	sender?: User;
 
 	@Field(type => Activity, { nullable: true })
 	activity?: Activity;

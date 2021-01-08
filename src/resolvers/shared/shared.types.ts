@@ -14,3 +14,9 @@ export class DefaultTypes {
 	@Field()
 	updatedAt!: Date;
 }
+
+@ObjectType()
+export class UpdateManyResponse {
+	@Field(() => Int)
+	count!: number;
+}

@@ -87,6 +87,7 @@ model ActivityInvitation {
     email      String
     token      String
     status     ActivityInvitationStatus @default(PENDING)
+    type       ActivityInvitationType
     expiresAt  DateTime
     createdAt  DateTime                 @default(now())
     updatedAt  DateTime                 @updatedAt
@@ -212,4 +213,9 @@ enum ActivityInvitationStatus {
     PENDING
     ACCEPTED
     REJECTED
+}
+
+enum ActivityInvitationType {
+    SENDER
+    RECEIVER
 }

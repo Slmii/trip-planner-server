@@ -1,10 +1,10 @@
-import { UserService } from './../user/user.service';
-import { Arg, Authorized, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
+import { Arg, Authorized, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
 
 import { NotificationService, Notification } from './index';
-import { Activity, ActivityService } from '../activity';
-import { User as UserType } from '../user';
 import { AddNotificationInput } from './inputs';
+import { Activity, ActivityService } from '../activity';
+import { User as UserType, UserService } from '../user';
+import { UpdateManyResponse } from '../shared';
 import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
 
@@ -15,11 +15,23 @@ export class NotificationResolver {
 	 */
 
 	@FieldResolver(type => UserType, {
-		description: 'Fetch the User who send the Notification'
+		description: 'Fetch the User who send the notification'
 	})
-	user(@Root() notification: Notification) {
+	sender(@Root() notification: Notification) {
 		return UserService.user({
 			userId: notification.senderUserId,
+			options: {
+				throwError: false
+			}
+		});
+	}
+
+	@FieldResolver(type => UserType, {
+		description: 'Fetch the User who receives the notification'
+	})
+	receiver(@Root() notification: Notification) {
+		return UserService.user({
+			userId: notification.receiverUserId,
 			options: {
 				throwError: false
 			}
@@ -59,7 +71,7 @@ export class NotificationResolver {
 
 	@Authorized()
 	@Mutation(returns => Notification, {
-		description: 'Add a notification'
+		description: 'Add a notification for the receiver.'
 	})
 	addNotification(@Arg('data') data: AddNotificationInput, @User() { userId }: CurrentUser) {
 		// userId is current user's ID. This will be used as the senderUserId.
@@ -73,15 +85,15 @@ export class NotificationResolver {
 	@Mutation(returns => Notification, {
 		description: "Set current user's notification as read"
 	})
-	setNotificationAsRead(@Arg('notificationId') notificationId: number, @User() { userId }: CurrentUser) {
+	setNotificationAsRead(@Arg('notificationId', type => Int) notificationId: number, @User() { userId }: CurrentUser) {
 		return NotificationService.setAsRead(notificationId, userId);
 	}
 
 	@Authorized()
-	@Mutation(returns => Notification, {
+	@Mutation(returns => UpdateManyResponse, {
 		description: "Set all current user's notifications as read"
 	})
-	setAllNotificationAsRead(@User() { userId }: CurrentUser) {
+	async setAllNotificationAsRead(@User() { userId }: CurrentUser) {
 		return NotificationService.setAllAsRead(userId);
 	}
 

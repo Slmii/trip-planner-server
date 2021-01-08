@@ -3,8 +3,12 @@ import { ActivityService } from '../activity';
 import { UserService } from './../user';
 import { helpers, prisma, errors } from './../../common/utils';
 
-// senderUserId = who send the notification
-// receiverUserId = who will receive the notification
+/**
+ * Add a notification linked to the receiver.
+ * senderUserId is the userId of the current user.
+ * @param  {AddNotificationInput} data
+ * @param  {number} senderUserId
+ */
 export const add = async (data: AddNotificationInput, senderUserId: number) => {
 	const { type, receiverUserId, activityId } = data;
 
@@ -42,7 +46,8 @@ export const getNotifications = (userId: number) => {
 		},
 		orderBy: {
 			createdAt: 'desc'
-		}
+		},
+		take: 5
 	});
 };
 
@@ -53,7 +58,7 @@ export const setAsRead = async (notificationId: number, userId: number) => {
 		}
 	});
 
-	if (!notification || !helpers.isCreator(notificationId, userId)) {
+	if (!notification || !helpers.isCreator(notification.receiverUserId!, userId)) {
 		throw errors.notFound;
 	}
 
