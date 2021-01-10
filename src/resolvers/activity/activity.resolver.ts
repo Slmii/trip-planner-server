@@ -1,11 +1,21 @@
-import { Arg, Authorized, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
+import {
+    Arg,
+    Authorized,
+    Ctx,
+    FieldResolver,
+    Int,
+    Mutation,
+    Query,
+    Resolver,
+    Root
+} from 'type-graphql';
 
-import { Activity, ActivityService } from './index';
-import { User as UserType } from './../user';
-import { ActivityType, ActivityTypeService } from './../activityType';
-import { TransportationType, TransportationTypeService } from './../transportationType';
-import { Context, CurrentUser } from '../../common/types';
 import { User } from '../../common/decorators';
+import { Context, CurrentUser } from '../../common/types';
+import { ActivityType, ActivityTypeService } from '../activityType';
+import { TransportationType, TransportationTypeService } from '../transportationType';
+import { User as UserType } from '../user';
+import { Activity, ActivityService } from './index';
 
 @Resolver(of => Activity)
 export class ActivityResolver {
@@ -17,7 +27,7 @@ export class ActivityResolver {
 		description: 'Fetch the activity type of an activity'
 	})
 	activityType(@Root() activity: Activity) {
-		return ActivityTypeService.getOne(activity.activityTypeId);
+		return ActivityTypeService.getActivityType(activity.activityTypeId);
 	}
 
 	@FieldResolver(type => TransportationType, {
@@ -53,7 +63,7 @@ export class ActivityResolver {
 	@Authorized()
 	@Query(returns => [Activity], {
 		description:
-			'Fetch trip activities. If current user is the creator of the trip then it includes both publicly and non-publicly available activities. If current user is not the creator of the trip then it will only include publicly available activities.'
+			'Fetch trip activities. If current user is the creator of the trip then it includes both public and private activities. If current user is not the creator of the trip then it will only include public activities.'
 	})
 	tripActivities(
 		@Arg('tripId', type => Int) tripId: number,
@@ -64,12 +74,12 @@ export class ActivityResolver {
 			return ActivityService.getUserTripAcitivites(tripId, userId);
 		}
 
-		return ActivityService.getTripActivities(tripId);
+		return ActivityService.getPublicTripActivities(tripId);
 	}
 
 	@Authorized()
 	@Query(returns => [Activity], {
-		description: 'Fetch a list of publicly available Activities'
+		description: 'Fetch a list of public activities'
 	})
 	publicActivities() {
 		return ActivityService.getPublicActivities();
@@ -87,7 +97,7 @@ export class ActivityResolver {
 	@Mutation(returns => Boolean, {
 		description: 'Link a user to an activity'
 	})
-	addUserToActivity(@Arg('activityId') activityId: number, @Arg('userId') userId: number) {
+	addUserToActivity(@Arg('activityId') activityId: number, @User() { userId }: CurrentUser) {
 		console.log(activityId, userId);
 
 		return true;

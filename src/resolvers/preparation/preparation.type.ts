@@ -1,13 +1,10 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { ObjectType, Field } from 'type-graphql';
 
 import { SubPreparation } from '../subPreparation';
 import { DefaultTypes } from '../shared';
 
 @ObjectType()
 export class Preparation extends DefaultTypes {
-	@Field(type => Int)
-	tripId!: number;
-
 	@Field()
 	name!: string;
 

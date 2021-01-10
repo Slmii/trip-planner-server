@@ -1,12 +1,12 @@
 import { Arg, Authorized, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
 
-import { NotificationService, Notification } from './index';
-import { AddNotificationInput } from './inputs';
-import { Activity, ActivityService } from '../activity';
-import { User as UserType, UserService } from '../user';
-import { UpdateManyResponse } from '../shared';
 import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
+import { prisma } from '../../common/utils';
+import { Activity } from '../activity';
+import { Notification, NotificationService } from '../notification';
+import { UpdateManyResponse } from '../shared';
+import { User as UserType, UserService } from '../user';
 
 @Resolver(of => Notification)
 export class NotificationResolver {
@@ -15,34 +15,48 @@ export class NotificationResolver {
 	 */
 
 	@FieldResolver(type => UserType, {
-		description: 'Fetch the User who send the notification'
+		description: 'Fetch the user who send the notification'
 	})
 	sender(@Root() notification: Notification) {
-		return UserService.user({
-			userId: notification.senderUserId,
-			options: {
-				throwError: false
-			}
-		});
-	}
-
-	@FieldResolver(type => UserType, {
-		description: 'Fetch the User who receives the notification'
-	})
-	receiver(@Root() notification: Notification) {
-		return UserService.user({
-			userId: notification.receiverUserId,
-			options: {
-				throwError: false
-			}
-		});
+		return UserService.user(notification.senderUserId);
 	}
 
 	@FieldResolver(type => Activity, {
-		description: 'Fetch the related public Activity of the Notification'
+		description: 'Fetch the related public activity of the notification'
 	})
-	activity(@Root() notification: Notification) {
-		return ActivityService.getPublicActivity(notification.activityId);
+	async activity(@Root() notification: Notification) {
+		const notificationToTrip = await prisma.notificationToActivities.findUnique({
+			where: {
+				notificationId_activityId: {
+					notificationId: notification.id,
+					activityId: notification.resourceId
+				}
+			},
+			include: {
+				activity: true
+			}
+		});
+
+		return notificationToTrip?.activity;
+	}
+
+	@FieldResolver(type => Activity, {
+		description: 'Fetch the related public trip of the notification'
+	})
+	async trip(@Root() notification: Notification) {
+		const notificationToTrip = await prisma.notificationToTrips.findUnique({
+			where: {
+				notificationId_tripId: {
+					notificationId: notification.id,
+					tripId: notification.resourceId
+				}
+			},
+			include: {
+				trip: true
+			}
+		});
+
+		return notificationToTrip?.trip;
 	}
 
 	/*
@@ -57,7 +71,7 @@ export class NotificationResolver {
 	@Query(returns => [Notification], {
 		description: "Fetch current user's notifictaions"
 	})
-	notifications(@User() { userId }: CurrentUser) {
+	headerNotifications(@User() { userId }: CurrentUser) {
 		return NotificationService.getNotifications(userId);
 	}
 
@@ -71,18 +85,6 @@ export class NotificationResolver {
 
 	@Authorized()
 	@Mutation(returns => Notification, {
-		description: 'Add a notification for the receiver.'
-	})
-	addNotification(@Arg('data') data: AddNotificationInput, @User() { userId }: CurrentUser) {
-		// userId is current user's ID. This will be used as the senderUserId.
-		// The sender will always be the one who send the notification,
-		// meaning its the one who's currently logged in
-		const senderUserId = userId;
-		return NotificationService.add(data, senderUserId);
-	}
-
-	@Authorized()
-	@Mutation(returns => Notification, {
 		description: "Set current user's notification as read"
 	})
 	setNotificationAsRead(@Arg('notificationId', type => Int) notificationId: number, @User() { userId }: CurrentUser) {
@@ -93,7 +95,7 @@ export class NotificationResolver {
 	@Mutation(returns => UpdateManyResponse, {
 		description: "Set all current user's notifications as read"
 	})
-	async setAllNotificationAsRead(@User() { userId }: CurrentUser) {
+	setAllNotificationAsRead(@User() { userId }: CurrentUser) {
 		return NotificationService.setAllAsRead(userId);
 	}
 

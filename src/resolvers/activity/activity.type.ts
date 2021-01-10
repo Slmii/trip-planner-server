@@ -1,9 +1,9 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 
-import { DefaultTypes } from '../shared';
-import { User } from '../user';
 import { ActivityType } from '../activityType';
+import { DefaultTypes } from '../shared';
 import { TransportationType } from '../transportationType';
+import { User } from '../user';
 
 @ObjectType()
 export class Activity extends DefaultTypes {

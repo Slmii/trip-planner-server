@@ -1,8 +1,8 @@
-import { shield, and, allow, deny } from 'graphql-shield';
 import { ApolloError } from 'apollo-server';
+import { allow, and, deny, shield } from 'graphql-shield';
 
+import { addTripSchema, editUserSchema, signUpSchema } from '../../validations';
 import { rules } from './rules';
-import { signUpSchema, editUserSchema, addTripSchema } from '../../validations';
 
 export const permissions = shield(
 	{

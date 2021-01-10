@@ -1,9 +1,9 @@
 import * as Sentry from '@sentry/node';
 import { MiddlewareFn } from 'type-graphql';
 
-import Logger from '../../loaders/logger';
 import { helpers } from '../../common/utils';
-import { Context } from './../types';
+import Logger from '../../loaders/logger';
+import { Context } from '../types';
 
 export const ErrorInterceptor: MiddlewareFn<Context> = async ({ context, info }, next) => {
 	try {

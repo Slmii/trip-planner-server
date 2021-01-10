@@ -1,19 +1,19 @@
 import * as Sentry from '@sentry/node';
-import morgan from 'morgan';
-import session from 'express-session';
+import { ApolloServer } from 'apollo-server-express';
 import cors from 'cors';
 import { Application } from 'express';
+import session from 'express-session';
 import { graphqlUploadExpress } from 'graphql-upload';
-import { ApolloServer } from 'apollo-server-express';
+import morgan from 'morgan';
 import { buildSchema } from 'type-graphql';
 
+import { ErrorInterceptor } from '../common/interceptors';
+import { authChecker, constants, prisma, redis, RedisStore, sentry } from '../common/utils';
 import config from '../config';
-import { UserResolver } from '../resolvers/user';
-import { TripResolver, createTripLoader } from '../resolvers/trip';
 import { FavoriteResolver } from '../resolvers/favorite';
 import { createLocationLoader, LocationResolver } from '../resolvers/location';
-import { ErrorInterceptor } from './../common/interceptors';
-import { authChecker, constants, RedisStore, redis, prisma, sentry } from '../common/utils';
+import { createTripLoader, TripResolver } from '../resolvers/trip';
+import { UserResolver } from '../resolvers/user';
 
 export default async (app: Application) => {
 	app.set('trust proxy', 1);

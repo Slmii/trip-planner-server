@@ -1,7 +1,7 @@
-import { InputType, Field } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 
-import { Role } from '../user.enums';
-import { StringFilter, BoolFilter, DateFilter, SortOrder } from '../../shared';
+import { BoolFilter, DateFilter, SortOrder, StringFilter } from '../../shared';
+import { Role } from '../../user';
 
 @InputType()
 export class UserWhereInput {

@@ -1,5 +1,5 @@
-import DataLoader from 'dataloader';
 import { Activity, User } from '@prisma/client';
+import DataLoader from 'dataloader';
 
 import { prisma } from '../../common/utils';
 
@@ -22,7 +22,7 @@ export const createActivityLoader = () =>
 
 export const createUsersToActivitiesLoader = () =>
 	new DataLoader<unknown, User[]>(async activityIds => {
-		const results = await prisma.usersToActivities.findMany({
+		const results = await prisma.userToActivities.findMany({
 			where: {
 				activityId: {
 					in: activityIds as number[]

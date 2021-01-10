@@ -1,34 +1,34 @@
 import 'reflect-metadata';
-import express, { Request, Response } from 'express';
+
 import * as Sentry from '@sentry/node';
-import morgan from 'morgan';
-import session from 'express-session';
-import cors from 'cors';
-import { graphqlUploadExpress } from 'graphql-upload';
 import { ApolloServer } from 'apollo-server-express';
+import cors from 'cors';
+import express, { Request, Response } from 'express';
+import session from 'express-session';
+import { graphqlUploadExpress } from 'graphql-upload';
+import morgan from 'morgan';
 import { buildSchema } from 'type-graphql';
 
+import { ErrorInterceptor } from './common/interceptors';
+import { authChecker, constants, prisma, redis, RedisStore, sentry } from './common/utils';
 import config from './config';
 import Logger from './loaders/logger';
 import sentryLoader from './loaders/sentry';
-import { ErrorInterceptor } from './common/interceptors';
-import { authChecker, constants, RedisStore, redis, prisma, sentry } from './common/utils';
-
-import { UserResolver } from './resolvers/user/user.resolver';
-import { FavoriteResolver } from './resolvers/favorite/favorite.resolver';
-import { TripResolver } from './resolvers/trip/trip.resolver';
-import { LocationResolver } from './resolvers/location/location.resolver';
+import { createActivityLoader, createUsersToActivitiesLoader } from './resolvers/activity';
 import { ActivityResolver } from './resolvers/activity/activity.resolver';
+import { ActivityTypeResolver } from './resolvers/activityType/activityType.resolver';
+import { FavoriteResolver } from './resolvers/favorite/favorite.resolver';
+import { InvitationResolver } from './resolvers/invitation/invitation.resolver';
+import { createLocationLoader } from './resolvers/location';
+import { LocationResolver } from './resolvers/location/location.resolver';
+import { NotificationResolver } from './resolvers/notification/notification.resolver';
+import { createPreparationLoader } from './resolvers/preparation';
 import { PreparationResolver } from './resolvers/preparation/preparation.resolver';
 import { SubPreparationResolver } from './resolvers/subPreparation/subPreparation.resolver';
 import { TransportationTypeResolver } from './resolvers/transportationType/transportationType.resolver';
-import { ActivityTypeResolver } from './resolvers/activityType/activityType.resolver';
-import { NotificationResolver } from './resolvers/notification/notification.resolver';
-
 import { createTripLoader } from './resolvers/trip';
-import { createLocationLoader } from './resolvers/location';
-import { createActivityLoader, createUsersToActivitiesLoader } from './resolvers/activity';
-import { createPreparationLoader } from './resolvers/preparation';
+import { TripResolver } from './resolvers/trip/trip.resolver';
+import { UserResolver } from './resolvers/user/user.resolver';
 
 const app = express();
 
@@ -85,6 +85,7 @@ const bootstrap = async () => {
 			LocationResolver,
 			FavoriteResolver,
 			ActivityResolver,
+			InvitationResolver,
 			PreparationResolver,
 			SubPreparationResolver,
 			TransportationTypeResolver,

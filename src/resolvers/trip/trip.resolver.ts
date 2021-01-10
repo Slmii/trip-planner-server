@@ -1,16 +1,15 @@
 import { Arg, Authorized, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
 
-import { Trip, TripService, TripsResponse } from './index';
-import { UserService, User as UserType } from '../user';
-import { Location } from '../location';
-import { FavoriteService } from '../favorite';
-import { PaginationInput } from '../shared';
-// import { Activity } from '../activity';
-import { Preparation } from '../preparation';
-import { AddTripInput, TripWhereInput, TripSortByInput } from './inputs';
-import { User } from '../../common/decorators';
+import { User as UserDecorator } from '../../common/decorators';
 import { Context, CurrentUser } from '../../common/types';
-import { errors, helpers } from '../../common/utils';
+import { helpers } from '../../common/utils';
+import { FavoriteService } from '../favorite';
+import { Location } from '../location';
+import { Preparation } from '../preparation';
+import { PaginationInput } from '../shared';
+import { Trip, TripService, TripsResponse } from '../trip';
+import { AddTripInput, TripSortByInput, TripWhereInput } from '../trip/inputs';
+import { User, UserService } from '../user';
 
 @Resolver(of => Trip)
 export class TripResolver {
@@ -19,32 +18,31 @@ export class TripResolver {
 	 */
 
 	@FieldResolver(type => Number, {
-		description:
-			'Return UserID if current User is the creator of the Trip. We do not want to expose personal fields. For Admins we always return the correct UserID'
+		description: 'Return userId if current user is the creator of the trip. We do not want to expose personal fields'
 	})
-	userId(@Root() trip: Trip, @User() currentUser: CurrentUser) {
+	userId(@Root() trip: Trip, @UserDecorator() currentUser: CurrentUser) {
 		const { userId } = currentUser;
-		if (helpers.hasUserRole(currentUser) && !helpers.isCreator(trip.userId, userId)) {
+
+		if (!helpers.isCreator(trip.userId, userId)) {
 			return 0;
 		}
 
 		return trip.userId;
 	}
 
-	@FieldResolver(type => UserType, {
+	@FieldResolver(type => User, {
 		nullable: true,
-		description: 'Fetch the related User of the Trip'
+		description:
+			'Fetch the related user of the trip. If current user is not the creator of the trip then only available if user has a public profile'
 	})
-	async user(@Root() trip: Trip, @User() currentUser: CurrentUser) {
-		const user = await UserService.user({
-			userId: trip.userId
-		});
+	async user(@Root() trip: Trip, @UserDecorator() { userId }: CurrentUser) {
+		const user = await UserService.user(trip.userId);
 
 		if (!user) {
 			return null;
 		}
 
-		if (helpers.hasUserRole(currentUser) && !helpers.isCreator(user.id, currentUser.userId) && !user.public) {
+		if (!helpers.isCreator(trip.userId, userId) && !user.public) {
 			return null;
 		}
 
@@ -58,18 +56,11 @@ export class TripResolver {
 		return loaders.location.load(trip.id);
 	}
 
-	// @FieldResolver(type => [Activity], {
-	// 	description: 'Fetch all activities of a trip'
-	// })
-	// activities(@Root() trip: Trip, @Ctx() { loaders }: Context) {
-	// 	return loaders.activity.load(trip.id);
-	// }
-
 	@FieldResolver(type => [Preparation], {
-		description: 'Fetch all preparations of a trip. This is only available for the creator of the Trip'
+		description: 'Fetch all preparations of a trip. This is only available for the creator of the trip'
 	})
-	preparations(@Root() trip: Trip, @Ctx() { loaders }: Context, @User() currentUser: CurrentUser) {
-		if (helpers.hasUserRole(currentUser) && !helpers.isCreator(trip.userId, currentUser.userId)) {
+	preparations(@Root() trip: Trip, @Ctx() { loaders }: Context, @UserDecorator() { userId }: CurrentUser) {
+		if (!helpers.isCreator(trip.userId, userId)) {
 			return [];
 		}
 
@@ -77,10 +68,10 @@ export class TripResolver {
 	}
 
 	@FieldResolver(type => Boolean, {
-		description: "Check if Trip is in current user's Favorite list"
+		description: "Check if trip is in current user's favorite list"
 	})
-	async isInFavorite(@Root() trip: Trip, @User() { userId }: CurrentUser) {
-		const favorite = await FavoriteService.getOne(trip.id, userId);
+	async isInFavorite(@Root() trip: Trip, @UserDecorator() { userId }: CurrentUser) {
+		const favorite = await FavoriteService.getFavorite(trip.id, userId);
 		return favorite ? true : false;
 	}
 
@@ -93,17 +84,26 @@ export class TripResolver {
 	 */
 	@Authorized()
 	@Query(returns => Trip, {
+		nullable: true,
 		description:
-			"Fetch a Trip. If current user has 'User' role then return a Trip if current user is the creator of the Trip. If not, then only return if Trip is publicly available"
+			"Fetch a trip. Return a user's trip if current user is the creator of the trip. If not, then only return if trip is publicly available"
 	})
-	async trip(@Arg('tripId', type => Int) tripId: number, @User() currentUser: CurrentUser) {
-		const trip = await TripService.getOne(tripId);
-
-		if (!trip || (helpers.hasUserRole(currentUser) && !helpers.isCreator(trip.userId!, currentUser.userId) && !trip.public)) {
-			throw errors.notFound;
+	async trip(
+		@Arg('tripId', type => Int) tripId: number,
+		@Arg('isCreator', { nullable: true }) isCreator: boolean,
+		@UserDecorator() { userId }: CurrentUser
+	) {
+		if (isCreator) {
+			return TripService.getTrip({
+				id: tripId,
+				userId
+			});
 		}
 
-		return trip;
+		return TripService.getTrip({
+			id: tripId,
+			public: true
+		});
 	}
 
 	@Authorized()
@@ -114,7 +114,7 @@ export class TripResolver {
 		@Arg('where', { nullable: true }) where: TripWhereInput,
 		@Arg('pagination') pagination: PaginationInput,
 		@Arg('orderBy', { nullable: true }) orderBy: TripSortByInput,
-		@User() { userId }: CurrentUser
+		@UserDecorator() { userId }: CurrentUser
 	) {
 		return TripService.getUserTrips({
 			userId,
@@ -126,27 +126,28 @@ export class TripResolver {
 
 	@Authorized()
 	@Query(returns => Trip, {
+		nullable: true,
 		description: 'Fetch upcoming Trip'
 	})
-	myUpcomingTrip(@User() { userId }: CurrentUser) {
+	myUpcomingTrip(@UserDecorator() { userId }: CurrentUser) {
 		return TripService.getUpcomingTrip(userId);
 	}
 
-	@Authorized(['ADMIN'])
-	@Query(returns => TripsResponse, {
-		description: 'Fetch a list of both publicly and non-publicly available Trips, only for Admins/Dashboard'
-	})
-	trips(
-		@Arg('where', { nullable: true }) where: TripWhereInput,
-		@Arg('pagination') pagination: PaginationInput,
-		@Arg('orderBy', { nullable: true }) orderBy: TripSortByInput
-	) {
-		return TripService.getTrips({
-			where,
-			pagination,
-			orderBy
-		});
-	}
+	// @Authorized(['ADMIN'])
+	// @Query(returns => TripsResponse, {
+	// 	description: 'Fetch a list of both publicly and non-publicly available Trips, only for Admins/Dashboard'
+	// })
+	// trips(
+	// 	@Arg('where', { nullable: true }) where: TripWhereInput,
+	// 	@Arg('pagination') pagination: PaginationInput,
+	// 	@Arg('orderBy', { nullable: true }) orderBy: TripSortByInput
+	// ) {
+	// 	return TripService.getPublicTrips({
+	// 		where,
+	// 		pagination,
+	// 		orderBy
+	// 	});
+	// }
 
 	@Authorized()
 	@Query(returns => TripsResponse, {
@@ -157,7 +158,7 @@ export class TripResolver {
 		@Arg('pagination') pagination: PaginationInput,
 		@Arg('orderBy', { nullable: true }) orderBy: TripSortByInput
 	) {
-		return TripService.getTrips({
+		return TripService.getPublicTrips({
 			where,
 			pagination,
 			orderBy
@@ -174,7 +175,7 @@ export class TripResolver {
 
 	@Authorized()
 	@Mutation(type => Trip)
-	addTrip(@Arg('data') data: AddTripInput, @User() { userId }: CurrentUser) {
+	addTrip(@Arg('data') data: AddTripInput, @UserDecorator() { userId }: CurrentUser) {
 		return TripService.add({
 			userId,
 			data
@@ -183,7 +184,7 @@ export class TripResolver {
 
 	@Authorized()
 	@Mutation(type => Trip)
-	editTrip(@Arg('tripId', type => Int) tripId: number, @Arg('data') data: AddTripInput, @User() { userId }: CurrentUser) {
+	editTrip(@Arg('tripId', type => Int) tripId: number, @Arg('data') data: AddTripInput, @UserDecorator() { userId }: CurrentUser) {
 		return TripService.edit({
 			tripId,
 			userId,
@@ -193,7 +194,7 @@ export class TripResolver {
 
 	@Authorized()
 	@Mutation(type => Trip)
-	deleteTrip(@Arg('tripId', type => Int) tripId: number, @User() { userId }: CurrentUser) {
+	deleteTrip(@Arg('tripId', type => Int) tripId: number, @UserDecorator() { userId }: CurrentUser) {
 		return TripService.deleteOne(tripId, userId);
 	}
 

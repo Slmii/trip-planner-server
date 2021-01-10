@@ -1,5 +1,5 @@
 import { IsIn, Max, Min } from 'class-validator';
-import { Field, Int, InputType } from 'type-graphql';
+import { Field, InputType, Int } from 'type-graphql';
 
 @InputType()
 export class PaginationInput {

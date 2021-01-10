@@ -1,7 +1,7 @@
 import { ArrayNotEmpty } from 'class-validator';
-import { InputType, Field } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 
-import { DateFilter, StringFilter, SortOrder } from '../../shared';
+import { DateFilter, SortOrder, StringFilter } from '../../shared';
 
 type SearchIn = 'trips' | 'activities' | 'preparations';
 

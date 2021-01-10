@@ -1,8 +1,8 @@
 import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 
-import { ActivityTypeService } from './index';
+import { AddActivityTypeInput } from '../ActivityType/inputs';
 import { ActivityType } from './activityType.type';
-import { AddActivityTypeInput } from './inputs';
+import { ActivityTypeService } from './index';
 
 @Resolver(of => ActivityType)
 export class ActivityTypeResolver {

@@ -1,9 +1,8 @@
-import { ObjectType, Field } from 'type-graphql';
+import { Field, ObjectType } from 'type-graphql';
 
-import { Role } from './user.enums';
-import { Trip } from '../trip';
-import { Favorite } from '../favorite';
 import { DefaultTypes } from '../shared';
+import { Trip } from '../trip';
+import { Role } from '../user';
 
 @ObjectType()
 export class User extends DefaultTypes {
@@ -38,7 +37,4 @@ export class User extends DefaultTypes {
 
 	@Field(type => [Trip])
 	trips!: Trip[];
-
-	@Field(type => [Favorite])
-	favorites!: Favorite[];
 }

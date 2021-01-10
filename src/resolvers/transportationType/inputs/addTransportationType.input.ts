@@ -1,5 +1,5 @@
 import { IsNotEmpty } from 'class-validator';
-import { InputType, Field } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 
 @InputType()
 export class AddTransportationTypeInput {

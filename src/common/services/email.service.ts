@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-import { Nodemailer } from '../common/types';
+import { Nodemailer } from '../types';
 
 export default {
 	send: async ({ email, html }: Nodemailer) => {

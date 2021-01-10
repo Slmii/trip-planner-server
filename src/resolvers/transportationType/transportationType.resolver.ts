@@ -1,8 +1,7 @@
 import { Arg, Authorized, Mutation, Query, Resolver } from 'type-graphql';
 
-import { TransportationTypeService } from './index';
-import { TransportationType } from './transportationType.type';
-import { AddTransportationTypeInput } from './inputs';
+import { TransportationType, TransportationTypeService } from '../transportationType';
+import { AddTransportationTypeInput } from '../transportationType/inputs';
 
 @Resolver(of => TransportationType)
 export class TransportationTypeResolver {

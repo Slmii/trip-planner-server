@@ -1,12 +1,13 @@
 import { Prisma } from '@prisma/client';
 
-import { AddTripInput, TripWhereInput, TripSortByInput } from './inputs';
-import { LocationService } from '../location';
-import { ActivityService } from '../activity';
-import { PreparationService } from '../preparation';
-import { SharedService } from '../shared';
 import { Filters } from '../../common/types';
 import { prisma } from '../../common/utils';
+import { ActivityService } from '../activity';
+import { LocationService } from '../location';
+import { PreparationService } from '../preparation';
+import { SharedService } from '../shared';
+import { SubPreparationService } from '../subPreparation';
+import { AddTripInput, TripSortByInput, TripWhereInput } from '../trip/inputs';
 
 export const add = (params: { userId: number; data: AddTripInput }) => {
 	const {
@@ -69,6 +70,7 @@ export const edit = async (params: { tripId: number; userId: number; data: AddTr
 	await LocationService.deleteManyByTripId(tripId, userId);
 	await ActivityService.deleteManyByTripId(tripId, userId);
 	await PreparationService.deleteManyByTripId(tripId, userId);
+	await SubPreparationService.deleteManyByTripId(tripId, userId);
 
 	return await prisma.trip.update({
 		where: {
@@ -103,14 +105,20 @@ export const deleteOne = async (tripId: number, userId: number) => {
 	});
 };
 
-export const getOne = (tripId: number) => {
-	return prisma.trip.findUnique({
-		where: {
-			id: tripId
-		}
+/**
+ * Find the first trip that matches the filter.
+ * @param  {Prisma.TripWhereInput} where - arguments to find a Trip
+ */
+export const getTrip = (where: Prisma.TripWhereInput) => {
+	return prisma.trip.findFirst({
+		where
 	});
 };
 
+/**
+ * Find all current user's trips that matches the filter.
+ * @param  {Filters<TripWhereInput, TripSortByInput> & { userId: number }} params - arguments to find current user's trips
+ */
 export const getUserTrips = async (params: Filters<TripWhereInput, TripSortByInput> & { userId: number }) => {
 	const { userId, where, pagination, orderBy } = params;
 
@@ -138,7 +146,10 @@ export const getUserTrips = async (params: Filters<TripWhereInput, TripSortByInp
 		trips
 	};
 };
-
+/**
+ * Find the first upcoming trip.
+ * @param  {number} userId
+ */
 export const getUpcomingTrip = (userId: number) => {
 	return prisma.trip.findFirst({
 		where: {
@@ -153,7 +164,7 @@ export const getUpcomingTrip = (userId: number) => {
 	});
 };
 
-export const getTrips = async (params: Filters<TripWhereInput, TripSortByInput>) => {
+export const getPublicTrips = async (params: Filters<TripWhereInput, TripSortByInput>) => {
 	const { where, pagination, orderBy } = params;
 
 	const tripWhereInput = SharedService.tripWhereInput(where);

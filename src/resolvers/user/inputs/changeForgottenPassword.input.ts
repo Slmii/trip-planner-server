@@ -1,5 +1,5 @@
 import { MinLength, ValidateIf } from 'class-validator';
-import { InputType, Field } from 'type-graphql';
+import { Field, InputType } from 'type-graphql';
 
 import { Match } from '../../../common/decorators';
 

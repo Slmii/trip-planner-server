@@ -2,24 +2,18 @@ import { ApolloError } from 'apollo-server';
 import { Response } from 'express';
 import { v4 } from 'uuid';
 
+import { Filters, IRequest, SignUpUser } from '../../common/types';
+import { errors, helpers, prisma, redis } from '../../common/utils';
 import config from '../../config';
-import { UserWhereInput, UserOrderByInput, EditUserInput } from './inputs';
-import { SignUpUser, IRequest, HandleErrorOptions, Filters } from '../../common/types';
-import { errors, helpers, redis, prisma } from '../../common/utils';
+import { EditUserInput, UserOrderByInput, UserWhereInput } from '../user/inputs';
 
 export const UserService = {
-	user: async ({ userId, options }: { userId: number; options?: HandleErrorOptions }) => {
-		const user = await prisma.user.findUnique({
+	user: (userId: number) => {
+		return prisma.user.findUnique({
 			where: {
 				id: userId
 			}
 		});
-
-		if (!user && options?.throwError) {
-			throw errors.notFound;
-		}
-
-		return user;
 	},
 	users: ({ where, pagination, orderBy }: Filters<UserWhereInput, UserOrderByInput>) => {
 		return prisma.user.findMany({
@@ -56,7 +50,7 @@ export const UserService = {
 		});
 	},
 	add: async ({ email, firstName, lastName, password, status, locked, role, public: publicUser }: SignUpUser) => {
-		const user = await helpers.findUserByEmail(prisma, email);
+		const user = await UserService.findUserByEmail(email);
 
 		if (user) {
 			throw errors.emailAddressExists;
@@ -131,7 +125,7 @@ export const UserService = {
 		return updatedUser;
 	},
 	forgottenPassword: async (email: string) => {
-		const user = await helpers.findUserByEmail(prisma, email);
+		const user = await UserService.findUserByEmail(email);
 
 		let token = '';
 
@@ -171,7 +165,7 @@ export const UserService = {
 		return updatedUser;
 	},
 	signIn: async (email: string, password: string) => {
-		const user = await helpers.findUserByEmail(prisma, email);
+		const user = await UserService.findUserByEmail(email);
 		const isPasswordValid = await helpers.validatePassword(password, user?.password);
 
 		if (!user || (user && !isPasswordValid)) {
@@ -201,6 +195,13 @@ export const UserService = {
 
 				resolve(true);
 			});
+		});
+	},
+	findUserByEmail: (email: string) => {
+		return prisma.user.findUnique({
+			where: {
+				email: email.toLowerCase()
+			}
 		});
 	}
 };

@@ -1,22 +1,21 @@
 import {
-	IsBoolean,
-	IsDate,
-	IsNotEmpty,
-	IsPositive,
-	Min,
-	MinDate,
-	ValidateIf,
-	MinLength,
-	ArrayNotEmpty,
-	ValidateNested,
-	IsDefined
+    ArrayNotEmpty,
+    IsBoolean,
+    IsDate,
+    IsDefined,
+    IsNotEmpty,
+    Min,
+    MinDate,
+    MinLength,
+    ValidateIf,
+    ValidateNested
 } from 'class-validator';
-import { InputType, Field, Int } from 'type-graphql';
+import { Field, InputType, Int } from 'type-graphql';
 
-import { AddLocationInput } from '../../location/inputs';
-import { AddActivityInput } from '../../activity/inputs';
-import { AddPreparationInput } from '../../preparation/inputs';
 import { IsAfter, IsBefore } from '../../../common/decorators';
+import { AddActivityInput } from '../../activity/inputs';
+import { AddLocationInput } from '../../location/inputs';
+import { AddPreparationInput } from '../../preparation/inputs';
 
 @InputType()
 export class AddTripInput {

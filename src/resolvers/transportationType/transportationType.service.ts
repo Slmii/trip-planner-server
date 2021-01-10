@@ -1,5 +1,5 @@
 import { prisma } from '../../common/utils';
-import { AddTransportationTypeInput } from './inputs';
+import { AddTransportationTypeInput } from '../transportationType/inputs';
 
 export const getOne = (transportationTypeId: number) => {
 	return prisma.transportationType.findUnique({

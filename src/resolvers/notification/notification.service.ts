@@ -1,7 +1,9 @@
-import { AddNotificationInput } from './inputs';
+import { errors, helpers, prisma } from '../../common/utils';
 import { ActivityService } from '../activity';
-import { UserService } from './../user';
-import { helpers, prisma, errors } from './../../common/utils';
+import { NotificationType } from '../notification';
+import { AddNotificationInput } from '../notification/inputs';
+import { TripService } from '../trip';
+import { UserService } from '../user';
 
 /**
  * Add a notification linked to the receiver.
@@ -10,35 +12,73 @@ import { helpers, prisma, errors } from './../../common/utils';
  * @param  {number} senderUserId
  */
 export const add = async (data: AddNotificationInput, senderUserId: number) => {
-	const { type, receiverUserId, activityId } = data;
+	const { type, receiverUserId, resourceId, read } = data;
 
-	const user = await UserService.user({
-		userId: receiverUserId,
-		options: {
-			throwError: false
-		}
-	});
+	const user = await UserService.user(receiverUserId);
 
 	if (!user) {
 		throw errors.notFound;
 	}
 
-	const activity = await ActivityService.getPublicActivity(activityId);
+	const isActivity = [
+		NotificationType.ACTIVITY_INVITATION_RECEIVED,
+		NotificationType.ACTIVITY_JOIN_REQUEST,
+		NotificationType.UPCOMING_ACTIVITY
+	].includes(type);
 
-	if (!activity || !activity.public) {
-		throw errors.notFound;
-	}
+	const isTrip = [NotificationType.UPCOMING_TRIP].includes(type);
 
-	return prisma.notification.create({
+	const notification = await prisma.notification.create({
 		data: {
 			type,
 			receiverUserId,
 			senderUserId,
-			activityId: activity.id
+			resourceId,
+			read
 		}
 	});
+
+	if (isActivity) {
+		const activity = await ActivityService.getPublicActivity(resourceId);
+
+		if (!activity) {
+			throw errors.notFound;
+		}
+
+		await prisma.notificationToActivities.create({
+			data: {
+				activityId: activity.id,
+				notificationId: notification.id
+			}
+		});
+	}
+
+	if (isTrip) {
+		const trip = await TripService.getTrip({
+			id: resourceId,
+			public: true
+		});
+
+		if (!trip) {
+			throw errors.notFound;
+		}
+
+		await prisma.notificationToTrips.create({
+			data: {
+				tripId: trip.id,
+				notificationId: notification.id
+			}
+		});
+	}
+
+	return notification;
 };
 
+/**
+ * Get all current user notifications. `receiverUserId` is current
+ * user who's logged in.
+ * @param  {number} userId
+ */
 export const getNotifications = (userId: number) => {
 	return prisma.notification.findMany({
 		where: {
@@ -51,6 +91,11 @@ export const getNotifications = (userId: number) => {
 	});
 };
 
+/**
+ * Set current user's notification as read.
+ * @param  {number} notificationId
+ * @param  {number} userId
+ */
 export const setAsRead = async (notificationId: number, userId: number) => {
 	const notification = await prisma.notification.findUnique({
 		where: {
@@ -72,6 +117,10 @@ export const setAsRead = async (notificationId: number, userId: number) => {
 	});
 };
 
+/**
+ * Set all current user's notifications as read.
+ * @param  {number} userId
+ */
 export const setAllAsRead = (userId: number) => {
 	return prisma.notification.updateMany({
 		data: {

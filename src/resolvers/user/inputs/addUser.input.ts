@@ -1,8 +1,8 @@
-import { IsEmail, IsAlpha, MinLength, ValidateIf, IsBoolean, IsEnum } from 'class-validator';
+import { IsAlpha, IsBoolean, IsEmail, IsEnum, MinLength, ValidateIf } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 import { Match } from '../../../common/decorators';
-import { Role } from '../user.enums';
+import { Role } from '../../user';
 
 @InputType()
 export class AddUserInput {

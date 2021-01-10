@@ -1,32 +1,14 @@
-import { TripService } from '../trip';
-import { Arg, Authorized, FieldResolver, Int, Mutation, Resolver, Root } from 'type-graphql';
+import { Arg, Authorized, Int, Mutation, Resolver } from 'type-graphql';
 
-import { Preparation, PreparationService } from './index';
 import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
-import { helpers } from '../../common/utils';
+import { Preparation, PreparationService } from '../preparation';
 
 @Resolver(of => Preparation)
 export class PreparationResolver {
 	/*
 	 * Field Resolvers
 	 */
-
-	@FieldResolver(type => Number, {
-		description:
-			'Return TripID if current User is the creator of the Trip. We do not want to expose personal fields. For Admins we always return the correct TripID'
-	})
-	async tripId(@Root() preparation: Preparation, @User() currentUser: CurrentUser) {
-		if (helpers.hasUserRole(currentUser)) {
-			const trip = await TripService.getOne(preparation.tripId);
-
-			if (!trip || !helpers.isCreator(preparation.tripId, trip.id)) {
-				return 0;
-			}
-		}
-
-		return preparation.tripId;
-	}
 
 	/*
 	 * End Field Resolvers

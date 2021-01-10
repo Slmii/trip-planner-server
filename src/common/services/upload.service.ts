@@ -1,4 +1,4 @@
-import { ReadStream, createWriteStream } from 'fs';
+import { createWriteStream, ReadStream } from 'fs';
 import shortid from 'shortid';
 
 import { File } from '../types';

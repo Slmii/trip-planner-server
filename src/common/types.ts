@@ -1,17 +1,18 @@
-import type { FileUpload } from 'graphql-upload';
-import { Session } from 'express-session';
-import { Request, Response } from 'express';
 import { PrismaClient, Role } from '@prisma/client';
+import { Request, Response } from 'express';
+import { Session } from 'express-session';
 import { Redis } from 'ioredis';
 
 import config from '../config';
+import { createActivityLoader, createUsersToActivitiesLoader } from '../resolvers/activity';
+import { createLocationLoader } from '../resolvers/location';
+import { createPreparationLoader } from '../resolvers/preparation';
 import { PaginationInput } from '../resolvers/shared';
+import { createTripLoader } from '../resolvers/trip';
 import { TripSortByInput, TripWhereInput } from '../resolvers/trip/inputs';
 import { UserOrderByInput, UserWhereInput } from '../resolvers/user/inputs';
-import { createTripLoader } from '../resolvers/trip';
-import { createLocationLoader } from '../resolvers/location';
-import { createActivityLoader, createUsersToActivitiesLoader } from '../resolvers/activity';
-import { createPreparationLoader } from '../resolvers/preparation';
+
+import type { FileUpload } from 'graphql-upload';
 
 /*
  *   GraphQL Context
@@ -99,7 +100,7 @@ type OrderByInput = UserOrderByInput | TripSortByInput;
 export interface CurrentUser {
 	userId: number;
 	email: string;
-	role: string;
+	role: Role;
 }
 
 export interface HandleErrorOptions {

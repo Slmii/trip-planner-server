@@ -1,5 +1,5 @@
 import { prisma } from '../../common/utils';
-import { AddPreparationInput } from './inputs';
+import { AddPreparationInput } from '../preparation/inputs';
 
 export const add = (tripId: number, preparation: AddPreparationInput) => {
 	return prisma.preparation.create({
@@ -20,6 +20,11 @@ export const addMany = (tripId: number, preparations: AddPreparationInput[]) => 
 	return Promise.all(createManyPreparations);
 };
 
+/**
+ * Delete a preparation. Only the creator of the activity can delete one.
+ * @param  {number} activityId
+ * @param  {number} userId
+ */
 export const deleteOne = async (preparationId: number, userId: number) => {
 	const preparation = await prisma.preparation.findFirst({
 		where: {
@@ -37,6 +42,11 @@ export const deleteOne = async (preparationId: number, userId: number) => {
 	});
 };
 
+/**
+ * Delete all trip preparations. Only the creator of the trip can delete.
+ * @param  {number} tripId
+ * @param  {number} userId
+ */
 export const deleteManyByTripId = (tripId: number, userId: number) => {
 	return prisma.preparation.deleteMany({
 		where: {

@@ -1,13 +1,14 @@
-import { PrismaClient, User } from '@prisma/client';
+import { PrismaClient, Role, User } from '@prisma/client';
 import { compare, hash } from 'bcrypt';
 import { ValidationError } from 'class-validator';
 import { GraphQLError } from 'graphql';
 
 import config from '../../config';
+import { NotificationType } from '../../resolvers/notification';
 import { CurrentUser, IRequest } from '../types';
 import { IS_DEVELOPMENT } from './constants';
 
-export const hasRole = (requiredRole: string, userRole: string) => {
+export const hasRole = (requiredRole: string, userRole: Role) => {
 	if (userRole === 'ADMIN') {
 		return true;
 	}
@@ -52,21 +53,6 @@ export const formatError = (err: GraphQLError): any => {
 	return err.message;
 };
 
-export const findUserByEmail = async (prisma: PrismaClient, email: string) => {
-	// try {
-	const user = await prisma.user.findUnique({
-		where: {
-			email: email.toLowerCase()
-		}
-	});
-
-	return user;
-	// } catch (error) {
-	// 	throw Error('dadadad');
-	// 	// TODO: catch all prisms query and return message
-	// }
-};
-
 export const findUserById = async (prisma: PrismaClient, id: number) => {
 	const user = await prisma.user.findUnique({
 		where: {
@@ -98,3 +84,25 @@ export const hasAdminRole = (user: CurrentUser | User) => {
 };
 
 export const isCreator = (value: number | string, valueToCompareWith: number | string) => value === valueToCompareWith;
+
+export const isActivityNotification = (type: NotificationType) => {
+	if (
+		[
+			NotificationType.ACTIVITY_INVITATION_RECEIVED,
+			NotificationType.ACTIVITY_JOIN_REQUEST,
+			NotificationType.UPCOMING_ACTIVITY
+		].includes(type)
+	) {
+		return true;
+	}
+
+	return false;
+};
+
+export const isTripNotification = (type: NotificationType) => {
+	if ([NotificationType.UPCOMING_TRIP].includes(type)) {
+		return true;
+	}
+
+	return false;
+};

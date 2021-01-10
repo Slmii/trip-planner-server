@@ -1,4 +1,4 @@
-import { AuthenticationError, UserInputError, ForbiddenError, ApolloError } from 'apollo-server';
+import { ApolloError, AuthenticationError, ForbiddenError, UserInputError } from 'apollo-server';
 
 export const errors = {
 	// Auth
@@ -11,6 +11,7 @@ export const errors = {
 	notAuthorized: new ForbiddenError('Not Authorized to use this endpoint'),
 	// Invalid Data
 	notFound: new Error('Resource not found'),
+	activityInvitationLimitReaced: new ApolloError('Limit reach for activity invitations', '422'),
 	invalidChangePasswordToken: new ApolloError('Invalid Change Password Token', '422'),
 	emailAddressExists: new UserInputError('Email address is already taken'),
 	invalidValues: (args: Record<string, string>) => new UserInputError('Invalid values', { invalidArgs: args })

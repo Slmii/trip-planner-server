@@ -1,4 +1,4 @@
-import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
+import { registerDecorator, ValidationArguments, ValidationOptions } from 'class-validator';
 
 const IsBefore = (property: string, validationOptions?: ValidationOptions) => {
 	return function (object: any, propertyName: string) {

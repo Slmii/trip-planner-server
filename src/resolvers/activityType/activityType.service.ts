@@ -1,7 +1,11 @@
 import { prisma } from '../../common/utils';
-import { AddActivityTypeInput } from './inputs';
+import { AddActivityTypeInput } from '../activityType/inputs';
 
-export const getOne = (activityTypeId: number) => {
+/**
+ * Get an activity type.
+ * @param  {number} activityTypeId
+ */
+export const getActivityType = (activityTypeId: number) => {
 	return prisma.activityType.findUnique({
 		where: {
 			id: activityTypeId
@@ -9,6 +13,9 @@ export const getOne = (activityTypeId: number) => {
 	});
 };
 
+/**
+ * Get all activity types.
+ */
 export const getActivityTypes = () => {
 	return prisma.activityType.findMany({
 		orderBy: {
@@ -17,6 +24,10 @@ export const getActivityTypes = () => {
 	});
 };
 
+/**
+ * Add an activity type.
+ * @param  {AddActivityTypeInput} data
+ */
 export const add = (data: AddActivityTypeInput) => {
 	return prisma.activityType.create({
 		data

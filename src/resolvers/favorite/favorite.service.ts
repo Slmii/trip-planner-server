@@ -1,8 +1,15 @@
-import { TripSortByInput, TripWhereInput } from '../trip/inputs';
-import { SharedService } from '../shared';
 import { Filters } from '../../common/types';
 import { errors, helpers, prisma } from '../../common/utils';
+import { SharedService } from '../shared';
+import { TripSortByInput, TripWhereInput } from '../trip';
 
+/**
+ * Add trip to current user's favorites list.
+ * If current user is not the creator its only possible if trip is public,
+ * if current user is the creator then its always possible.
+ * @param  {number} tripId
+ * @param  {number} userId
+ */
 export const add = async (tripId: number, userId: number) => {
 	const trip = await prisma.trip.findUnique({
 		where: {
@@ -22,7 +29,13 @@ export const add = async (tripId: number, userId: number) => {
 	});
 };
 
-export const getOne = (tripId: number, userId: number) => {
+/**
+ * Get a trip in current user's favorite list. `userId` is necessary because there
+ * could be more than one trip with the same `tripId` (connected to other users)
+ * @param  {number} tripId
+ * @param  {number} userId
+ */
+export const getFavorite = (tripId: number, userId: number) => {
 	return prisma.favorite.findUnique({
 		where: {
 			userId_tripId: {
@@ -33,7 +46,11 @@ export const getOne = (tripId: number, userId: number) => {
 	});
 };
 
-export const getUserFavorites = async (params: Filters<TripWhereInput, TripSortByInput> & { userId: number }) => {
+/**
+ * Get current user's favorite trips.
+ * @param  {Filters<TripWhereInput, TripSortByInput> & { userId: number }} params
+ */
+export const getFavorites = async (params: Filters<TripWhereInput, TripSortByInput> & { userId: number }) => {
 	const { userId, where, pagination, orderBy } = params;
 
 	const tripWhereInput = SharedService.tripWhereInput(where);
@@ -69,6 +86,12 @@ export const getUserFavorites = async (params: Filters<TripWhereInput, TripSortB
 	};
 };
 
+/**
+ * Delete a trip from favorites list. Only the creator of the trip
+ * can delete one.
+ * @param  {number} tripId
+ * @param  {number} userId
+ */
 export const deleteOne = (tripId: number, userId: number) => {
 	return prisma.favorite.delete({
 		where: {

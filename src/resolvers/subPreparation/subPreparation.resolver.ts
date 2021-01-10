@@ -1,8 +1,8 @@
 import { Arg, Authorized, Int, Mutation, Resolver } from 'type-graphql';
 
-import { SubPreparation, SubPreparationService } from './index';
 import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
+import { SubPreparation, SubPreparationService } from '../subPreparation';
 
 @Resolver(of => SubPreparation)
 export class SubPreparationResolver {

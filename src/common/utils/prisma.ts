@@ -1,5 +1,5 @@
-import fs from 'fs';
 import { PrismaClient } from '@prisma/client';
+import fs from 'fs';
 
 const prisma = new PrismaClient({
 	log: [

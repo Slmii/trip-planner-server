@@ -1,10 +1,9 @@
-import { ObjectType, Field, Int } from 'type-graphql';
+import { Field, Int, ObjectType } from 'type-graphql';
 
-import { User } from '../user';
 import { Location } from '../location';
+import { Preparation } from '../preparation';
 import { DefaultTypes } from '../shared';
-// import { Activity } from '../activity';
-import { Preparation } from './../preparation';
+import { User } from '../user';
 
 @ObjectType()
 export class Trip extends DefaultTypes {

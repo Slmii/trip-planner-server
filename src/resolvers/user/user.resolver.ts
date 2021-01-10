@@ -1,14 +1,13 @@
-import { Query, Resolver, Ctx, Arg, Authorized, FieldResolver, Root, Mutation, Int } from 'type-graphql';
+import { Arg, Authorized, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
 
-import { UserService, User as UserType } from './index';
-import { ChangeForgottenPasswordInput, AddUserInput, EditUserInput, SignInInput, UserOrderByInput, UserWhereInput } from './inputs';
-import { Trip } from '../trip';
-import { Favorite } from '../favorite';
 import { User } from '../../common/decorators';
-import { Context, CurrentUser } from '../../common/types';
-import { PaginationInput } from '../shared';
 import { EmailService } from '../../common/services';
-import { helpers, prisma } from '../../common/utils';
+import { Context, CurrentUser } from '../../common/types';
+import { helpers } from '../../common/utils';
+import { PaginationInput } from '../shared';
+import { Trip } from '../trip';
+import { User as UserType, UserService } from '../user';
+import { AddUserInput, ChangeForgottenPasswordInput, EditUserInput, SignInInput, UserOrderByInput, UserWhereInput } from '../user/inputs';
 
 @Resolver(of => UserType)
 export class UserResolver {
@@ -21,17 +20,6 @@ export class UserResolver {
 	})
 	trips(@Root() user: UserType, @Ctx() { loaders }: Context) {
 		return loaders.trip.load(user.id);
-	}
-
-	@FieldResolver(type => [Favorite], {
-		description: 'Fetch the related Favorites of the User'
-	})
-	favorites(@Root() user: UserType) {
-		return prisma.favorite.findMany({
-			where: {
-				userId: user.id
-			}
-		});
 	}
 
 	/*
@@ -48,23 +36,21 @@ export class UserResolver {
 			"Fetch the current user that is logged in. This can never be null because we use the @Authorized decorator, if not authorized then it'll throw an error"
 	})
 	me(@User() { userId }: CurrentUser) {
-		return UserService.user({
-			userId
-		});
+		return UserService.user(userId);
 	}
 
-	@Authorized(['ADMIN'])
-	@Query(returns => [UserType], {
-		description: 'Fetch a User'
-	})
-	user(@Arg('userId', type => Int) userId: number) {
-		return UserService.user({
-			userId,
-			options: {
-				throwError: true
-			}
-		});
-	}
+	// @Authorized(['ADMIN'])
+	// @Query(returns => [UserType], {
+	// 	description: 'Fetch a User'
+	// })
+	// user(@Arg('userId', type => Int) userId: number) {
+	// 	return UserService.user({
+	// 		userId,
+	// 		options: {
+	// 			throwError: true
+	// 		}
+	// 	});
+	// }
 
 	@Authorized(['ADMIN'])
 	@Query(returns => [UserType], {
@@ -91,7 +77,8 @@ export class UserResolver {
 	 */
 
 	@Mutation(returns => UserType)
-	async signIn(@Arg('data') { email, password }: SignInInput, @Ctx() { req }: Context) {
+	async signIn(@Arg('data') data: SignInInput, @Ctx() { req }: Context) {
+		const { email, password } = data;
 		const user = await UserService.signIn(email, password);
 
 		// Login User

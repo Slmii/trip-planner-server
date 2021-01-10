@@ -1,9 +1,9 @@
+import { Role } from '@prisma/client';
 import { rule } from 'graphql-shield';
 import { ObjectSchema } from 'yup';
-import { Role } from '@prisma/client';
 
-import { errors, helpers } from '../../utils';
 import { Context } from '../types';
+import { errors, helpers } from '../utils';
 
 export const rules = {
 	isAuthenticated: rule({ cache: 'contextual' })((_parent, _args, { req }: Context) => {
@@ -12,7 +12,7 @@ export const rules = {
 	isAuthorized: (role: Role) => {
 		return rule({ cache: 'contextual' })((_parent, _args, { req }: Context) => {
 			const user = helpers.getCurrentUser(req);
-			return helpers.hasRole(role, user.role) ? true : errors.notAuthorized;
+			return helpers.hasRole(role, user?.role ?? 'USER') ? true : errors.notAuthorized;
 		});
 	},
 	isInputValid: (schema: ObjectSchema) =>

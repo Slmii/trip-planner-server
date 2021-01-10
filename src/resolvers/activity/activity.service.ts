@@ -1,5 +1,5 @@
 import { prisma } from '../../common/utils';
-import { AddActivityInput } from './inputs';
+import { AddActivityInput } from '../activity/inputs';
 
 export const add = (tripId: number, activity: AddActivityInput) => {
 	return prisma.activity.create({
@@ -25,7 +25,7 @@ export const addMany = (tripId: number, activities: AddActivityInput[]) => {
 export const addUserToActivity = (activityId: number, userId: number) => {
 	// TODO: check if user profile and activity is public, only then its allowed to join activities
 
-	return prisma.usersToActivities.create({
+	return prisma.userToActivities.create({
 		data: {
 			activityId,
 			userId
@@ -35,7 +35,6 @@ export const addUserToActivity = (activityId: number, userId: number) => {
 
 /**
  * Get current user's public and private activities when viewing a trip.
- * Checks if current user is creator.
  * @param  {number} tripId
  * @param  {number} userId
  */
@@ -54,11 +53,11 @@ export const getUserTripAcitivites = (tripId: number, userId: number) => {
 };
 
 /**
- * Get publicly available activities when viewing a trip.
- * Does not need a check if current user is creator.
+ * Get public activities when viewing a trip. Available for everyone
+ * thus can be used in explore page.
  * @param  {number} tripId
  */
-export const getTripActivities = (tripId: number) => {
+export const getPublicTripActivities = (tripId: number) => {
 	return prisma.activity.findMany({
 		where: {
 			tripId,
@@ -68,8 +67,8 @@ export const getTripActivities = (tripId: number) => {
 };
 
 /**
- * Get public activity.
- * Does not need a check if current user is creator.
+ * Get a public activity. Available for everyone thus can be used in
+ * explore page.
  * @param  {number} activityId
  */
 export const getPublicActivity = (activityId: number) => {
@@ -82,8 +81,8 @@ export const getPublicActivity = (activityId: number) => {
 };
 
 /**
- * Get all public activities.
- * Does not need a check if current user is creator.
+ * Get all public activities. Available for everyone thus can be used in
+ * explore page.
  */
 export const getPublicActivities = () => {
 	// TODO: implement filters.
@@ -93,6 +92,38 @@ export const getPublicActivities = () => {
 		}
 	});
 };
+
+/**
+ * Get current user's activity.
+ * @param  {number} activityId
+ * @param  {number} userId
+ */
+export const getUserActivity = (activityId: number, userId: number) => {
+	return prisma.activity.findFirst({
+		where: {
+			id: activityId,
+			trip: {
+				userId
+			}
+		}
+	});
+};
+
+/**
+ * Get all current user's public and private activities.
+ * @param  {number} userId
+ */
+export const getUserActivities = (userId: number) => {
+	// TODO: implement filters.
+	return prisma.activity.findMany({
+		where: {
+			trip: {
+				userId
+			}
+		}
+	});
+};
+
 /**
  * Delete an activity. Only the creator of the activity can delete one.
  * @param  {number} activityId
@@ -118,6 +149,11 @@ export const deleteOne = async (activityId: number, userId: number) => {
 	});
 };
 
+/**
+ * Delete all trip activities. Only the creator of the trip can delete.
+ * @param  {number} tripId
+ * @param  {number} userId
+ */
 export const deleteManyByTripId = (tripId: number, userId: number) => {
 	return prisma.activity.deleteMany({
 		where: {

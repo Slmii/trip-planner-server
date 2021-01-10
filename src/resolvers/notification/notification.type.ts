@@ -2,6 +2,7 @@ import { Field, Int, ObjectType } from 'type-graphql';
 
 import { Activity } from '../activity';
 import { DefaultTypes } from '../shared';
+import { Trip } from '../trip';
 import { User } from '../user';
 import { NotificationType } from './notification.enums';
 
@@ -14,7 +15,7 @@ export class Notification extends DefaultTypes {
 	senderUserId!: number;
 
 	@Field(type => Int)
-	activityId!: number;
+	resourceId!: number;
 
 	@Field(type => NotificationType)
 	type!: NotificationType;
@@ -30,4 +31,7 @@ export class Notification extends DefaultTypes {
 
 	@Field(type => Activity, { nullable: true })
 	activity?: Activity;
+
+	@Field(type => Trip, { nullable: true })
+	trip?: Trip;
 }

@@ -1,5 +1,5 @@
-import { IsEmail, IsAlpha } from 'class-validator';
-import { InputType, Field } from 'type-graphql';
+import { IsAlpha, IsEmail } from 'class-validator';
+import { Field, InputType } from 'type-graphql';
 
 @InputType()
 export class EditUserInput {

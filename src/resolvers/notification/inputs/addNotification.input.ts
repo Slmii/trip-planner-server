@@ -1,4 +1,4 @@
-import { IsEnum, IsBoolean, IsPositive } from 'class-validator';
+import { IsBoolean, IsEnum, IsPositive } from 'class-validator';
 import { Field, InputType, Int } from 'type-graphql';
 
 import { NotificationType } from '../notification.enums';
@@ -11,7 +11,7 @@ export class AddNotificationInput {
 
 	@Field(type => Int)
 	@IsPositive()
-	activityId!: number;
+	resourceId!: number;
 
 	@Field(type => NotificationType)
 	@IsEnum(NotificationType, {

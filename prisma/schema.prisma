@@ -24,9 +24,11 @@ model User {
 
     trips                 Trip[]
     favorites             Favorite[]
-    activities            UsersToActivities[]
-    notificationsReceiver Notification[]      @relation("receiver")
-    notificationsSender   Notification[]      @relation("sender")
+    activities            UserToActivities[]
+    notificationsReceiver Notification[]              @relation("receiver")
+    notificationsSender   Notification[]              @relation("sender")
+    receivedInvitations   UserToReceivedInvitations[]
+    sentInvitations       UserToSentInvitations[]
 }
 
 model Trip {
@@ -45,11 +47,12 @@ model Trip {
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
 
-    user         User?         @relation(fields: [userId], references: [id])
-    favorites    Favorite[]
-    activities   Activity[]
-    locations    Location[]
-    preparations Preparation[]
+    user          User?                 @relation(fields: [userId], references: [id])
+    favorites     Favorite[]
+    activities    Activity[]
+    locations     Location[]
+    preparations  Preparation[]
+    notifications NotificationToTrips[]
 
     @@unique([userId, id])
 }
@@ -70,31 +73,32 @@ model Activity {
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 
-    trip                Trip?                @relation(fields: [tripId], references: [id])
-    activityType        ActivityType         @relation(fields: [activityTypeId], references: [id])
-    transportationType  TransportationType   @relation(fields: [transportationTypeId], references: [id])
-    users               UsersToActivities[]
-    activityInvitations ActivityInvitation[]
-    notifications       Notification[]
+    trip               Trip?                      @relation(fields: [tripId], references: [id])
+    activityType       ActivityType               @relation(fields: [activityTypeId], references: [id])
+    transportationType TransportationType         @relation(fields: [transportationTypeId], references: [id])
+    users              UserToActivities[]
+    notificattions     NotificationToActivities[]
+    invitations        Invitation[]
 
     @@unique([tripId, id])
 }
 
-model ActivityInvitation {
-    id         Int                      @id @default(autoincrement())
-    uuid       String                   @default(uuid())
+model Invitation {
+    id         Int              @id @default(autoincrement())
+    uuid       String           @default(uuid())
     activityId Int?
     email      String
     token      String
-    status     ActivityInvitationStatus @default(PENDING)
-    type       ActivityInvitationType
+    status     InvitationStatus @default(PENDING)
     expiresAt  DateTime
-    createdAt  DateTime                 @default(now())
-    updatedAt  DateTime                 @updatedAt
+    createdAt  DateTime         @default(now())
+    updatedAt  DateTime         @updatedAt
 
-    activity Activity? @relation(fields: [activityId], references: [id])
+    activity            Activity?                   @relation(fields: [activityId], references: [id])
+    receivedInvitations UserToReceivedInvitations[]
+    sentInvitations     UserToSentInvitations[]
 
-    @@unique([email, token, id])
+    @@unique([email, activityId, id])
 }
 
 model ActivityType {
@@ -174,27 +178,69 @@ model Notification {
     uuid           String           @default(uuid())
     receiverUserId Int?
     senderUserId   Int?
-    activityId     Int?
+    resourceId     Int
     type           NotificationType
     read           Boolean          @default(false)
     createdAt      DateTime         @default(now())
     updatedAt      DateTime         @updatedAt
 
-    receiver User?     @relation("receiver", fields: [receiverUserId], references: [id])
-    sender   User?     @relation("sender", fields: [senderUserId], references: [id])
-    activity Activity? @relation(fields: [activityId], references: [id])
+    receiver   User?                      @relation("receiver", fields: [receiverUserId], references: [id])
+    sender     User?                      @relation("sender", fields: [senderUserId], references: [id])
+    trips      NotificationToTrips[]
+    activities NotificationToActivities[]
 }
 
-model UsersToActivities {
+model NotificationToTrips {
+    notificationId Int
+    tripId         Int
+
+    notification Notification @relation(fields: [notificationId], references: [id])
+    trip         Trip         @relation(fields: [tripId], references: [id])
+
+    @@id([notificationId, tripId])
+}
+
+model NotificationToActivities {
+    notificationId Int
+    activityId     Int
+
+    notification Notification @relation(fields: [notificationId], references: [id])
+    activity     Activity     @relation(fields: [activityId], references: [id])
+
+    @@id([notificationId, activityId])
+}
+
+model UserToActivities {
     userId     Int
     activityId Int
-    createdAt  DateTime @default(now())
 
     user     User     @relation(fields: [userId], references: [id])
     activity Activity @relation(fields: [activityId], references: [id])
 
     @@id([userId, activityId])
     @@unique([userId, activityId])
+}
+
+model UserToReceivedInvitations {
+    invitationId Int
+    userId       Int
+
+    invitation Invitation @relation(fields: [invitationId], references: [id])
+    user       User       @relation(fields: [userId], references: [id])
+
+    @@id([userId, invitationId])
+    @@unique([userId, invitationId])
+}
+
+model UserToSentInvitations {
+    invitationId Int
+    userId       Int
+
+    invitation Invitation @relation(fields: [invitationId], references: [id])
+    user       User       @relation(fields: [userId], references: [id])
+
+    @@id([userId, invitationId])
+    @@unique([userId, invitationId])
 }
 
 enum Role {
@@ -209,13 +255,8 @@ enum NotificationType {
     UPCOMING_ACTIVITY
 }
 
-enum ActivityInvitationStatus {
+enum InvitationStatus {
     PENDING
     ACCEPTED
     REJECTED
-}
-
-enum ActivityInvitationType {
-    SENDER
-    RECEIVER
 }

@@ -1,12 +1,11 @@
-import { UserService } from './../user/user.service';
 import { Arg, Authorized, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
-import { User } from '../../common/decorators';
 
-import { Favorite, FavoriteService } from '../favorite';
-import { User as UserType } from '../user';
-import { Trip, TripSortByInput, TripService, TripsResponse, TripWhereInput } from '../trip';
-import { PaginationInput } from '../shared';
+import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
+import { Favorite, FavoriteService } from '../favorite';
+import { PaginationInput } from '../shared';
+import { Trip, TripService, TripSortByInput, TripsResponse, TripWhereInput } from '../trip';
+import { User as UserType, UserService } from '../user';
 
 @Resolver(of => Favorite)
 export class FavoriteResolver {
@@ -18,16 +17,17 @@ export class FavoriteResolver {
 		description: 'Fetch the related Trip of the Favorite'
 	})
 	user(@Root() favorite: Favorite) {
-		return UserService.user({
-			userId: favorite.userId
-		});
+		return UserService.user(favorite.userId);
 	}
 
 	@FieldResolver(type => Trip, {
 		description: 'Fetch the related Trip of the Favorite'
 	})
-	trip(@Root() favorite: Favorite) {
-		return TripService.getOne(favorite.tripId);
+	trip(@Root() favorite: Favorite, @User() { userId }: CurrentUser) {
+		return TripService.getTrip({
+			id: favorite.tripId,
+			userId
+		});
 	}
 
 	/*
@@ -44,7 +44,7 @@ export class FavoriteResolver {
 		@Arg('orderBy', type => TripSortByInput, { nullable: true }) orderBy: TripSortByInput,
 		@User() { userId }: CurrentUser
 	) {
-		return FavoriteService.getUserFavorites({
+		return FavoriteService.getFavorites({
 			userId,
 			where,
 			pagination,

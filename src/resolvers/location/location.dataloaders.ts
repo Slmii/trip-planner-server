@@ -1,5 +1,5 @@
-import DataLoader from 'dataloader';
 import { Location } from '@prisma/client';
+import DataLoader from 'dataloader';
 
 import { prisma } from '../../common/utils';
 
