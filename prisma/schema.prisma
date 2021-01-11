@@ -69,7 +69,7 @@ model Activity {
     date                 DateTime
     timezone             String
     public               Boolean
-    maxPeople            Int?     @default(0)
+    maxPeople            Int      @default(0)
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 
@@ -249,7 +249,7 @@ enum Role {
 }
 
 enum NotificationType {
-    ACTIVITY_INVITATION_RECEIVED
+    ACTIVITY_INVITATION_SENT
     ACTIVITY_JOIN_REQUEST
     UPCOMING_TRIP
     UPCOMING_ACTIVITY

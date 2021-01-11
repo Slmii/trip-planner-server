@@ -10,10 +10,11 @@ export class AddInvitationInput {
 	@Field(type => [String])
 	@IsArray()
 	@IsEmail(undefined, {
+		message: 'Provide a valid email address',
 		each: true
 	})
 	@ArrayNotEmpty({
-		message: 'Provide atleast 1 email'
+		message: 'Provide at least 1 email address'
 	})
 	emails!: string[];
 }

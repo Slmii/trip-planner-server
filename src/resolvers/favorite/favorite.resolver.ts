@@ -4,7 +4,8 @@ import { User } from '../../common/decorators';
 import { CurrentUser } from '../../common/types';
 import { Favorite, FavoriteService } from '../favorite';
 import { PaginationInput } from '../shared';
-import { Trip, TripService, TripSortByInput, TripsResponse, TripWhereInput } from '../trip';
+import { Trip, TripService, TripsResponse } from '../trip';
+import { TripSortByInput, TripWhereInput } from '../trip/inputs';
 import { User as UserType, UserService } from '../user';
 
 @Resolver(of => Favorite)

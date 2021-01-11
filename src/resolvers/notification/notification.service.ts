@@ -1,32 +1,18 @@
 import { errors, helpers, prisma } from '../../common/utils';
 import { ActivityService } from '../activity';
-import { NotificationType } from '../notification';
 import { AddNotificationInput } from '../notification/inputs';
 import { TripService } from '../trip';
-import { UserService } from '../user';
 
 /**
  * Add a notification linked to the receiver.
  * senderUserId is the userId of the current user.
- * @param  {AddNotificationInput} data
- * @param  {number} senderUserId
+ * @param  {AddNotificationInput & { senderUserId}} data
  */
-export const add = async (data: AddNotificationInput, senderUserId: number) => {
-	const { type, receiverUserId, resourceId, read } = data;
+export const add = async (data: AddNotificationInput & { senderUserId: number }) => {
+	const { type, senderUserId, receiverUserId, resourceId } = data;
 
-	const user = await UserService.user(receiverUserId);
-
-	if (!user) {
-		throw errors.notFound;
-	}
-
-	const isActivity = [
-		NotificationType.ACTIVITY_INVITATION_RECEIVED,
-		NotificationType.ACTIVITY_JOIN_REQUEST,
-		NotificationType.UPCOMING_ACTIVITY
-	].includes(type);
-
-	const isTrip = [NotificationType.UPCOMING_TRIP].includes(type);
+	const isActivity = helpers.isActivityNotification(type);
+	const isTrip = helpers.isTripNotification(type);
 
 	const notification = await prisma.notification.create({
 		data: {
@@ -34,7 +20,7 @@ export const add = async (data: AddNotificationInput, senderUserId: number) => {
 			receiverUserId,
 			senderUserId,
 			resourceId,
-			read
+			read: false
 		}
 	});
 

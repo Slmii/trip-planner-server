@@ -137,7 +137,10 @@ export class UserResolver {
 	}
 
 	@Mutation(returns => Boolean)
-	async changeForgottenPassword(@Arg('data') { token, password }: ChangeForgottenPasswordInput, @Ctx() { req, redis }: Context) {
+	async changeForgottenPassword(
+		@Arg('data') { token, password }: ChangeForgottenPasswordInput,
+		@Ctx() { req, redis }: Context
+	) {
 		const user = await UserService.changeForgottenPassword(token, password);
 
 		// Remove used token from Redis

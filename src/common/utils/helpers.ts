@@ -88,7 +88,7 @@ export const isCreator = (value: number | string, valueToCompareWith: number | s
 export const isActivityNotification = (type: NotificationType) => {
 	if (
 		[
-			NotificationType.ACTIVITY_INVITATION_RECEIVED,
+			NotificationType.ACTIVITY_INVITATION_SENT,
 			NotificationType.ACTIVITY_JOIN_REQUEST,
 			NotificationType.UPCOMING_ACTIVITY
 		].includes(type)

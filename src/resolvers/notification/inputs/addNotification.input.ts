@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsPositive } from 'class-validator';
+import { IsEnum, IsPositive } from 'class-validator';
 import { Field, InputType, Int } from 'type-graphql';
 
 import { NotificationType } from '../notification.enums';
@@ -18,8 +18,4 @@ export class AddNotificationInput {
 		message: 'Provide a valid type'
 	})
 	type!: NotificationType;
-
-	@Field({ nullable: true, defaultValue: false })
-	@IsBoolean()
-	read?: boolean;
 }

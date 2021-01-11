@@ -56,6 +56,10 @@ export const UserService = {
 			throw errors.emailAddressExists;
 		}
 
+		// TODO:
+		// if has invitation token in URL, add data to table `UserToReceivedInvitations` after user has signed up (!important)
+		// put a query string + token in the URL so the user will be redirected to the correct page after signup
+
 		const newUser = await prisma.user.create({
 			data: {
 				email: email.toLowerCase(),

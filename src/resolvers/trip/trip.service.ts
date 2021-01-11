@@ -15,8 +15,19 @@ export const add = (params: { userId: number; data: AddTripInput }) => {
 		data: { locations, activities, preparations, ...trip }
 	} = params;
 
+	// TODO: if trip is private than no public activities are allowed
 	const createActivities: Prisma.ActivityCreateInput[] | undefined = activities?.map(
-		({ name, description, location, date, timezone, public: publicActivity, maxPeople, activityTypeId, transportationTypeId }) => ({
+		({
+			name,
+			description,
+			location,
+			date,
+			timezone,
+			public: publicActivity,
+			maxPeople,
+			activityTypeId,
+			transportationTypeId
+		}) => ({
 			name,
 			description,
 			location,

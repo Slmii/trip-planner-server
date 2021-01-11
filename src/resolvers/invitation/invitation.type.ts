@@ -13,9 +13,6 @@ export class Invitation extends DefaultTypes {
 	@Field()
 	email!: string;
 
-	@Field()
-	token!: string;
-
 	@Field(type => InvitationStatus)
 	status!: InvitationStatus;
 
@@ -27,4 +24,11 @@ export class Invitation extends DefaultTypes {
 
 	@Field(type => User, { nullable: true })
 	user?: User;
+}
+
+export interface AddSingleInvitation {
+	receiverUserId?: number;
+	senderUserId: number;
+	activityId: number;
+	email: string;
 }

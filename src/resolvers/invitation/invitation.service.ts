@@ -3,25 +3,21 @@ import { nanoid } from 'nanoid';
 
 import { errors, prisma } from '../../common/utils';
 import { ActivityService } from '../activity';
+import { AddSingleInvitation } from '../invitation';
 import { AddInvitationInput } from '../invitation/inputs';
+import { NotificationService, NotificationType } from '../notification';
+import { UserService } from '../user';
 
-const add = async (data: { userId: number; activityId: number; email: string; maxPeople: number }) => {
-	const { email, activityId, userId, maxPeople } = data;
-
-	const invitations = await prisma.invitation.count({
-		where: {
-			activityId
-		}
-	});
-
-	if (invitations >= maxPeople) {
-		throw errors.activityInvitationLimitReaced;
-	}
+/**
+ * Add an invitation. Invitations can be sent as long as the amount of people
+ * that have joined does not exceed `maxPeople`
+ * @param  {AddSingleInvitation} data
+ */
+const add = async (data: AddSingleInvitation) => {
+	const { email, activityId, receiverUserId, senderUserId } = data;
 
 	const expiryDate = new Date();
 	expiryDate.setHours(expiryDate.getHours() + 1);
-
-	// TODO: add notification to receiver as 'activity join invitaion' (ACTIVITI_INVITATION_JOIN)
 
 	return prisma.invitation.create({
 		data: {
@@ -31,8 +27,17 @@ const add = async (data: { userId: number; activityId: number; email: string; ma
 			activityId,
 			sentInvitations: {
 				create: {
-					userId
+					userId: senderUserId
 				}
+			},
+			// If user exists then also add to `userToReceivedInvitations`. If not then
+			// that will happen when the invited user creates an account.
+			receivedInvitations: {
+				create: receiverUserId
+					? {
+							userId: receiverUserId
+					  }
+					: undefined
 			}
 		}
 	});
@@ -40,9 +45,7 @@ const add = async (data: { userId: number; activityId: number; email: string; ma
 
 /**
  * Add more than 1 invitation. Only available of the current user is the
- * creator of the activity and the activity is public. This does _not_ add
- * data to table `userToReceivedInvitations`. That will happen when the
- * user accepts the invitation.
+ * creator of the activity and the activity is public.
  * @param  {Input.AddInvitationInput & { userId: number }} data
  */
 const addMany = async (data: AddInvitationInput & { userId: number }) => {
@@ -54,24 +57,40 @@ const addMany = async (data: AddInvitationInput & { userId: number }) => {
 		throw errors.notFound;
 	}
 
-	// TODO:
-	// add data to table `UserToReceivedInvitations` after user has signed up (!important)
-	// put a query string + token in the URL so the user will be redirected to the correct page after signup
-	// check if existing profile is public, only then can the user join (show an alert or something)
+	const users = await prisma.userToActivities.count({
+		where: {
+			activityId
+		}
+	});
+
+	// If maximum allowed people has been reached
+	if (users >= activity.maxPeople) {
+		throw errors.activityJoinLimitReached;
+	}
 
 	const invitations: Invitation[] = [];
 
 	for (const email of emails) {
+		const receiverUser = await UserService.findUserByEmail(email);
+
 		const invitation = await add({
 			activityId,
 			email,
-			userId,
-			maxPeople: activity.maxPeople ?? 0
+			senderUserId: userId,
+			receiverUserId: receiverUser?.id
 		});
 
-		if (invitation) {
-			invitations.push(invitation);
+		// Add a notification if the user has an account
+		if (receiverUser) {
+			await NotificationService.add({
+				receiverUserId: receiverUser.id,
+				resourceId: invitation.activityId!,
+				senderUserId: userId,
+				type: NotificationType.ACTIVITY_INVITATION_SENT
+			});
 		}
+
+		invitations.push(invitation);
 	}
 
 	return invitations;
@@ -99,7 +118,6 @@ const getReceivedInvitations = async (userId: number) => {
  * @param  {number} userId
  */
 const getSentInvitations = async (userId: number) => {
-	// TODO: show in front-end that when a user has a private profile the user cannot join before making profile public
 	const userToSentInvitations = await prisma.userToSentInvitations.findMany({
 		where: {
 			userId
