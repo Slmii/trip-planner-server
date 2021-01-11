@@ -9,8 +9,7 @@ import { NotificationService, NotificationType } from '../notification';
 import { UserService } from '../user';
 
 /**
- * Add an invitation. Invitations can be sent as long as the amount of people
- * that have joined does not exceed `maxPeople`
+ * Add an invitation.
  * @param  {AddSingleInvitation} data
  */
 const add = async (data: AddSingleInvitation) => {
@@ -45,7 +44,9 @@ const add = async (data: AddSingleInvitation) => {
 
 /**
  * Add more than 1 invitation. Only available of the current user is the
- * creator of the activity and the activity is public.
+ * creator of the activity and the trip and activity is public. Invitations
+ * can be sent as long as the amount of people that have joined does not
+ * exceed `maxPeople`
  * @param  {Input.AddInvitationInput & { userId: number }} data
  */
 const addMany = async (data: AddInvitationInput & { userId: number }) => {

@@ -1,6 +1,7 @@
 import { Arg, Authorized, FieldResolver, Mutation, Query, Resolver, Root } from 'type-graphql';
 
 import { User } from '../../common/decorators';
+import { EmailService } from '../../common/services';
 import { CurrentUser } from '../../common/types';
 import { Activity, ActivityService } from '../activity';
 import { Invitation, InvitationService } from '../invitation';
@@ -57,11 +58,23 @@ export class InvitationResolver {
 
 	@Authorized()
 	@Mutation(returns => [Invitation])
-	addInvitations(@Arg('data') data: AddInvitationInput, @User() { userId }: CurrentUser) {
-		return InvitationService.addMany({
+	async addInvitations(@Arg('data') data: AddInvitationInput, @User() { userId }: CurrentUser) {
+		const invitations = await InvitationService.addMany({
 			...data,
 			userId
 		});
+
+		for (const invitation of invitations) {
+			// TODO: send out an email with link to an URL. at the URL check if user exsists, if does redirect to signin, if not redirect to signup
+			// TODO: use sendgrid
+			await EmailService.send({
+				email: invitation.email,
+				subject: 'Activity invitation',
+				html: `<a href="http://localhost:3000/invitations/${invitation.token}">Activity invitation</a>`
+			});
+		}
+
+		return invitations;
 	}
 
 	/*

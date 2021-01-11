@@ -1,34 +1,40 @@
 import nodemailer from 'nodemailer';
 
+import config from '../../config';
 import { Nodemailer } from '../types';
 
-export default {
-	send: async ({ email, html }: Nodemailer) => {
-		// create reusable transporter object using the default SMTP transport
-		const transporter = nodemailer.createTransport({
-			host: 'smtp.gmail.com',
-			port: 587,
-			secure: false,
-			requireTLS: true,
-			auth: {
-				user: 'selami.corlido@gmail.com', // like : abc@gmail.com
-				pass: 'corlidoTR92.' // like : pass@123
-			}
+const send = async ({ email, subject, html }: Nodemailer) => {
+	// Create reusable transporter object using the default SMTP transport
+	const transporter = nodemailer.createTransport({
+		host: 'smtp.gmail.com',
+		port: 587,
+		secure: false,
+		requireTLS: true,
+		auth: {
+			user: config.nodemailer.address,
+			pass: config.nodemailer.password
+		},
+		tls: {
+			secureProtocol: 'TLSv1_method'
+		}
+	});
+
+	try {
+		// send mail with defined transport object
+		const info = await transporter.sendMail({
+			from: '"Dev__ Foo 👻" dev-foo@mail.com', // sender address
+			to: email, // list of receivers
+			subject, // Subject line
+			html
 		});
 
-		try {
-			// send mail with defined transport object
-			const info = await transporter.sendMail({
-				from: '"Dev__ Foo 👻" dev-foo@mail.com', // sender address
-				to: email, // list of receivers
-				subject: 'Reset password', // Subject line
-				html
-			});
-
-			console.log('Message sent: %s', info.messageId);
-			console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
-		} catch (error) {
-			console.log('nodemailer error', error);
-		}
+		console.log('Message sent: %s', info.messageId);
+		console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
+	} catch (error) {
+		console.log('nodemailer error', error);
 	}
+};
+
+export const EmailService = {
+	send
 };

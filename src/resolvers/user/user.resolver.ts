@@ -7,7 +7,14 @@ import { helpers } from '../../common/utils';
 import { PaginationInput } from '../shared';
 import { Trip } from '../trip';
 import { User as UserType, UserService } from '../user';
-import { AddUserInput, ChangeForgottenPasswordInput, EditUserInput, SignInInput, UserOrderByInput, UserWhereInput } from '../user/inputs';
+import {
+    AddUserInput,
+    ChangeForgottenPasswordInput,
+    EditUserInput,
+    SignInInput,
+    UserOrderByInput,
+    UserWhereInput
+} from '../user/inputs';
 
 @Resolver(of => UserType)
 export class UserResolver {
@@ -129,6 +136,7 @@ export class UserResolver {
 			// Send an email with a link to change password
 			await EmailService.send({
 				email,
+				subject: 'Reset password',
 				html: `<a href="http://localhost:3000/reset-password/${token}">Reset Password</a>`
 			});
 		}

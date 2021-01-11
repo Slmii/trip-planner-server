@@ -67,6 +67,7 @@ export interface ChangeForgottenPassword {
 
 export interface Nodemailer {
 	email: string | string[];
+	subject: string;
 	html: string;
 }
 

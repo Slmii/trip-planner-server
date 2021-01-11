@@ -1,4 +1,4 @@
-import EmailService from './email.service';
 import UploadService from './upload.service';
 
-export { EmailService, UploadService };
+export { UploadService };
+export { EmailService } from './email.service';

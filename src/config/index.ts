@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { config } from 'dotenv';
+
 const envFound = config();
 
 if (envFound.error) {
@@ -16,5 +17,9 @@ export default {
 	port: process.env.PORT!,
 	cookeSecret: process.env.COOKIE_SECRET!,
 	redisUrl: process.env.REDIS_URL!,
-	cookieName: 'qid'
+	cookieName: 'qid',
+	nodemailer: {
+		address: process.env.GMAIL_ADDRESS!,
+		password: process.env.GMAIL_PASSWORD!
+	}
 };
