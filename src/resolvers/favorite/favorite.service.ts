@@ -1,7 +1,7 @@
 import { Filters } from '../../common/types';
 import { errors, helpers, prisma } from '../../common/utils';
 import { SharedService } from '../shared';
-import { TripSortByInput, TripWhereInput } from '../trip';
+import { TripSortByInput, TripWhereInput } from '../trip/inputs';
 
 /**
  * Add trip to current user's favorites list.
@@ -66,23 +66,24 @@ export const getFavorites = async (params: Filters<TripWhereInput, TripSortByInp
 		}
 	});
 
-	const favorites = await prisma.trip.findMany({
+	const favorites = await prisma.favorite.findMany({
 		where: {
-			...tripWhereInput,
-			favorites: {
-				some: {
-					userId
-				}
+			trip: {
+				...tripWhereInput,
+				userId
 			}
 		},
 		orderBy,
+		include: {
+			trip: true
+		},
 		skip: pagination?.skip,
 		take: pagination?.take
 	});
 
 	return {
 		totalCount,
-		trips: favorites
+		trips: favorites.map(favorite => favorite.trip)
 	};
 };
 

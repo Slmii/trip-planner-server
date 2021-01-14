@@ -26,6 +26,15 @@ export class Invitation extends DefaultTypes {
 	user?: User;
 }
 
+@ObjectType()
+export class TokenValidationResponse {
+	@Field()
+	token!: string;
+
+	@Field()
+	hasAccount!: boolean;
+}
+
 export interface AddSingleInvitation {
 	receiverUserId?: number;
 	senderUserId: number;

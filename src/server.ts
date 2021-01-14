@@ -94,7 +94,8 @@ const bootstrap = async () => {
 		],
 		globalMiddlewares: [ErrorInterceptor],
 		authChecker,
-		validate: true
+		validate: true,
+		emitSchemaFile: true
 	});
 
 	const apolloServer = new ApolloServer({
@@ -132,7 +133,9 @@ const bootstrap = async () => {
 		cors: false
 	});
 
-	app.listen(parseInt(config.port), () => console.log(`Server ready at http://localhost:${config.port}${apolloServer.graphqlPath}`));
+	app.listen(parseInt(config.port), () =>
+		console.log(`Server ready at http://localhost:${config.port}${apolloServer.graphqlPath}`)
+	);
 };
 
 bootstrap().catch((err: Error) => {

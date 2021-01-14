@@ -1,3 +1,4 @@
+import date from './date';
 import prisma from './prisma';
 
 export { sentry } from './apolloPlugins';
@@ -6,4 +7,5 @@ export * as constants from './constants';
 export { errors } from './errors';
 export * as helpers from './helpers';
 export { redis, RedisStore } from './redis';
+export { date };
 export { prisma };

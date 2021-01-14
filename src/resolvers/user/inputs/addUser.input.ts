@@ -45,6 +45,9 @@ export class AddUserInput {
 	@IsBoolean()
 	locked?: boolean;
 
+	@Field({ nullable: true })
+	invitationToken?: string;
+
 	@Field(type => Role, { nullable: true })
 	@IsEnum(Role, {
 		message: 'Provide a valid role'

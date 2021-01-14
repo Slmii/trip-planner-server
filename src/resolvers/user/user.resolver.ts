@@ -102,7 +102,7 @@ export class UserResolver {
 
 	// @ValidateArgs(signUpSchema)
 	@Mutation(returns => UserType)
-	async signUp(@Arg('data') data: AddUserInput, @Ctx() { req }: Context) {
+	async signUp(@Arg('data') { status, locked, role, ...data }: AddUserInput, @Ctx() { req }: Context) {
 		const user = await UserService.add(data);
 
 		// Login User

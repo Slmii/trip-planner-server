@@ -4,7 +4,7 @@ import { User } from '../../common/decorators';
 import { EmailService } from '../../common/services';
 import { CurrentUser } from '../../common/types';
 import { Activity, ActivityService } from '../activity';
-import { Invitation, InvitationService } from '../invitation';
+import { Invitation, InvitationService, TokenValidationResponse } from '../invitation';
 import { AddInvitationInput } from '../invitation/inputs';
 import { User as UserType, UserService } from '../user';
 
@@ -48,6 +48,23 @@ export class InvitationResolver {
 		return InvitationService.getSentInvitations(userId);
 	}
 
+	@Query(returns => TokenValidationResponse)
+	async validateInvitationToken(@Arg('token') token: string): Promise<TokenValidationResponse> {
+		const invitation = await InvitationService.validate(token);
+		const user = await UserService.findUserByEmail(invitation.email);
+
+		return {
+			token: invitation.token,
+			hasAccount: user ? true : false
+		};
+	}
+
+	@Query(returns => String)
+	async getEmailAddressByInvitationToken(@Arg('token') token: string) {
+		const invitation = await InvitationService.validate(token);
+		return invitation.email;
+	}
+
 	/*
 	 * End Queries
 	 */
@@ -65,7 +82,6 @@ export class InvitationResolver {
 		});
 
 		for (const invitation of invitations) {
-			// TODO: send out an email with link to an URL. at the URL check if user exsists, if does redirect to signin, if not redirect to signup
 			// TODO: use sendgrid
 			await EmailService.send({
 				email: invitation.email,

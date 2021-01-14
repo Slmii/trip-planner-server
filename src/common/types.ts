@@ -47,10 +47,7 @@ export interface SignUpUser {
 	firstName: string;
 	lastName: string;
 	password: string;
-	status?: boolean;
-	locked?: boolean;
-	role?: Role;
-	public?: boolean;
+	invitationToken?: string;
 }
 
 export interface EditUser {

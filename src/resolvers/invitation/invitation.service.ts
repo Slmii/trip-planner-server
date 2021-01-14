@@ -1,7 +1,7 @@
 import { Invitation } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
-import { errors, prisma } from '../../common/utils';
+import { date, errors, prisma } from '../../common/utils';
 import { ActivityService } from '../activity';
 import { AddSingleInvitation } from '../invitation';
 import { AddInvitationInput } from '../invitation/inputs';
@@ -131,8 +131,31 @@ const getSentInvitations = async (userId: number) => {
 	return userToSentInvitations.map(({ invitation }) => invitation);
 };
 
+/**
+ * Validate the invitation token on null and expiry date.
+ * @param  {string} token
+ */
+const validate = async (token: string) => {
+	const invitation = await prisma.invitation.findFirst({
+		where: {
+			token
+		}
+	});
+
+	if (!invitation) {
+		throw errors.notFound;
+	}
+
+	if (date.isAfter(invitation.expiresAt)) {
+		throw errors.expiredInvitation;
+	}
+
+	return invitation;
+};
+
 export const InvitationService = {
 	addMany,
 	getReceivedInvitations,
-	getSentInvitations
+	getSentInvitations,
+	validate
 };
