@@ -16,7 +16,7 @@ export class DefaultTypes {
 }
 
 @ObjectType()
-export class UpdateManyResponse {
+export class ManyResponse {
 	@Field(() => Int)
 	count!: number;
 }

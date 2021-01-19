@@ -1,6 +1,7 @@
 import { errors, helpers, prisma } from '../../common/utils';
 import { ActivityService } from '../activity';
 import { AddNotificationInput } from '../notification/inputs';
+import { PaginationInput } from '../shared/shared.inputs';
 import { TripService } from '../trip';
 
 /**
@@ -63,17 +64,21 @@ export const add = async (data: AddNotificationInput & { senderUserId: number })
 /**
  * Get all current user notifications. `receiverUserId` is current
  * user who's logged in.
- * @param  {number} userId
+ * @param  { userId: number; pagination?: PaginationInput } params
  */
-export const getNotifications = (userId: number) => {
+export const getNotifications = (params: { userId: number; read?: boolean; pagination?: PaginationInput }) => {
+	const { userId, read, pagination } = params;
+
 	return prisma.notification.findMany({
 		where: {
-			receiverUserId: userId
+			receiverUserId: userId,
+			read
 		},
 		orderBy: {
 			createdAt: 'desc'
 		},
-		take: 5
+		take: pagination?.take ?? 5,
+		skip: pagination?.skip
 	});
 };
 
@@ -112,6 +117,58 @@ export const setAllAsRead = (userId: number) => {
 		data: {
 			read: true
 		},
+		where: {
+			receiverUserId: userId
+		}
+	});
+};
+
+/**
+ * Clear (delete) a user's notification.
+ * @param  {number} notificationId
+ * @param  {number} userId
+ */
+export const clear = async (notificationId: number, userId: number) => {
+	const notification = await prisma.notification.findUnique({
+		where: {
+			id: notificationId
+		}
+	});
+
+	if (notification?.receiverUserId !== userId) {
+		throw errors.notFound;
+	}
+
+	await prisma.notificationToActivities.delete({
+		where: {
+			notificationId_activityId: {
+				notificationId: notification.id,
+				activityId: notification.resourceId
+			}
+		}
+	});
+
+	return prisma.notification.delete({
+		where: {
+			id: notification.id
+		}
+	});
+};
+
+/**
+ * Clear (delete) all user's notifications.
+ * @param  {number} userId
+ */
+export const clearAll = async (userId: number) => {
+	await prisma.notificationToActivities.deleteMany({
+		where: {
+			notification: {
+				receiverUserId: userId
+			}
+		}
+	});
+
+	return prisma.notification.deleteMany({
 		where: {
 			receiverUserId: userId
 		}

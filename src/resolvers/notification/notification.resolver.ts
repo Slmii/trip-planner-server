@@ -5,7 +5,7 @@ import { CurrentUser } from '../../common/types';
 import { prisma } from '../../common/utils';
 import { Activity } from '../activity';
 import { Notification, NotificationService } from '../notification';
-import { UpdateManyResponse } from '../shared';
+import { ManyResponse, PaginationInput } from '../shared';
 import { User as UserType, UserService } from '../user';
 
 @Resolver(of => Notification)
@@ -71,8 +71,12 @@ export class NotificationResolver {
 	@Query(returns => [Notification], {
 		description: "Fetch current user's notifictaions"
 	})
-	headerNotifications(@User() { userId }: CurrentUser) {
-		return NotificationService.getNotifications(userId);
+	notifications(
+		@Arg('read', { nullable: true }) read: boolean,
+		@Arg('pagination', { nullable: true }) pagination: PaginationInput,
+		@User() { userId }: CurrentUser
+	) {
+		return NotificationService.getNotifications({ userId, read, pagination });
 	}
 
 	/*
@@ -92,11 +96,27 @@ export class NotificationResolver {
 	}
 
 	@Authorized()
-	@Mutation(returns => UpdateManyResponse, {
+	@Mutation(returns => ManyResponse, {
 		description: "Set all current user's notifications as read"
 	})
 	setAllNotificationAsRead(@User() { userId }: CurrentUser) {
 		return NotificationService.setAllAsRead(userId);
+	}
+
+	@Authorized()
+	@Mutation(returns => Notification, {
+		description: "Clear (delete) user's notification"
+	})
+	clearNotification(@Arg('notificationId', type => Int) notificationId: number, @User() { userId }: CurrentUser) {
+		return NotificationService.clear(notificationId, userId);
+	}
+
+	@Authorized()
+	@Mutation(returns => ManyResponse, {
+		description: "Clear (delete) all user's notifications"
+	})
+	clearAllNotifications(@User() { userId }: CurrentUser) {
+		return NotificationService.clearAll(userId);
 	}
 
 	/*
