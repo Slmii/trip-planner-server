@@ -4,7 +4,7 @@
 	"private": true,
 	"main": "server.js",
 	"dependencies": {
-		"@prisma/client": "^2.14.0",
+		"@prisma/client": "^2.15.0",
 		"@sentry/node": "^5.26.0",
 		"@sentry/tracing": "^5.27.2",
 		"apollo-server": "^2.18.2",
@@ -32,7 +32,7 @@
 		"yup": "^0.29.3"
 	},
 	"devDependencies": {
-		"@prisma/cli": "^2.14.0",
+		"@prisma/cli": "^2.15.0",
 		"@types/bcrypt": "^3.0.0",
 		"@types/connect-redis": "0.0.14",
 		"@types/cors": "^2.8.8",

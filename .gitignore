@@ -18,7 +18,6 @@ yarn-error.log*
 
 # local env files
 .env
-prisma/migrations
-prisma/.env
+prisma
 .vscode
 schema.gql
