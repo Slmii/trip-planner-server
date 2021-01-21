@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 
-import { TripWhereInput } from '../trip';
+import { TripWhereInput } from '../trip/inputs';
 
 export const tripWhereInput = (where?: TripWhereInput): Prisma.TripWhereInput => {
 	const searchQuery: Prisma.TripWhereInput | undefined = where?.search?.contains
