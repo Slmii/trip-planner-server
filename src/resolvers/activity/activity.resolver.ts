@@ -1,14 +1,4 @@
-import {
-    Arg,
-    Authorized,
-    Ctx,
-    FieldResolver,
-    Int,
-    Mutation,
-    Query,
-    Resolver,
-    Root
-} from 'type-graphql';
+import { Arg, Authorized, Ctx, FieldResolver, Int, Mutation, Query, Resolver, Root } from 'type-graphql';
 
 import { User } from '../../common/decorators';
 import { Context, CurrentUser } from '../../common/types';
@@ -54,7 +44,7 @@ export class ActivityResolver {
 
 	@Authorized()
 	@Query(returns => [Activity], {
-		description: "Fetch current user's trip activities, this includes both publicly and non-publicly available activities"
+		description: "Fetch current user's trip activities, this includes both public and private activities"
 	})
 	myTripActivities(@Arg('tripId', type => Int) tripId: number, @User() { userId }: CurrentUser) {
 		return ActivityService.getUserTripAcitivites(tripId, userId);

@@ -35,6 +35,9 @@ export class User extends DefaultTypes {
 	@Field()
 	public!: boolean;
 
+	@Field({ nullable: true })
+	profileImgUrl?: string;
+
 	@Field(type => [Trip])
 	trips!: Trip[];
 }

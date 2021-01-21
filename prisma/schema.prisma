@@ -1,6 +1,5 @@
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["uncheckedScalarInputs"]
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -9,18 +8,19 @@ datasource db {
 }
 
 model User {
-    id        Int      @id @default(autoincrement())
-    uuid      String   @default(uuid())
-    email     String   @unique
-    firstName String
-    lastName  String
-    password  String
-    status    Boolean  @default(true)
-    locked    Boolean  @default(false)
-    role      Role     @default(USER)
-    public    Boolean  @default(true)
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+    id            Int      @id @default(autoincrement())
+    uuid          String   @default(uuid())
+    email         String   @unique
+    firstName     String
+    lastName      String
+    password      String
+    status        Boolean  @default(true)
+    locked        Boolean  @default(false)
+    role          Role     @default(USER)
+    public        Boolean  @default(true)
+    profileImgUrl String?  @default("")
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
 
     trips                 Trip[]
     favorites             Favorite[]
@@ -64,12 +64,12 @@ model Activity {
     activityTypeId       Int
     transportationTypeId Int
     name                 String
-    description          String?
+    description          String
     location             String
     date                 DateTime
     timezone             String
     public               Boolean
-    maxPeople            Int      @default(0)
+    maxPeople            Int
     createdAt            DateTime @default(now())
     updatedAt            DateTime @updatedAt
 

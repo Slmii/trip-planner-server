@@ -6,8 +6,7 @@ import {
     IsPositive,
     Min,
     MinDate,
-    MinLength,
-    ValidateIf
+    MinLength
 } from 'class-validator';
 import { Field, InputType, Int } from 'type-graphql';
 
@@ -19,15 +18,14 @@ export class AddActivityInput {
 	})
 	name!: string;
 
-	@Field({ nullable: true })
-	@ValidateIf(o => o.public)
+	@Field()
 	@MinLength(10, {
 		message: 'Description must be atleast $constraint1 characters long'
 	})
 	@IsDefined({
 		message: 'Provide a description'
 	})
-	description?: string;
+	description!: string;
 
 	@Field()
 	@IsNotEmpty({
@@ -54,13 +52,12 @@ export class AddActivityInput {
 	@IsBoolean()
 	public!: boolean;
 
-	@Field(type => Int, { nullable: true })
-	@ValidateIf(o => o.public)
+	@Field(type => Int)
 	@Min(1)
 	@IsDefined({
 		message: 'Provide a number of max people who can join'
 	})
-	maxPeople?: number;
+	maxPeople!: number;
 
 	@Field(type => Int)
 	@IsPositive()

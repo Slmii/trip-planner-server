@@ -17,15 +17,19 @@ export const addMany = (tripId: number, activities: AddActivityInput[]) => {
 };
 
 /**
- * Add a user to join an activity. Only possible when the trip, acvitity and user profile
- * are public and if the user has received an invitation.
+ * Add a user to join an activity.
  * @param  {number} activityId
  * @param  {number} userId
  */
 export const addUserToActivity = (activityId: number, userId: number) => {
-	// TODO: check if user profile, trip and activity is public, only then its allowed to join activities
-	// TODO: check if user has an invitation
-	// TODO: show in front-end that when a user has a private profile the user cannot join before making profile public
+	// TODO:
+	// If activity is private then only available to join when creator has invited someone. Trip
+	// and user profile do not need to be public.
+	// Private activities or not available in the 'explore' pages.
+	// Public activities are only available for joining if trip and activity are public.
+	// 1. check if user has an invitation.
+	// 2. show in front-end that when a user has a private profile that its highly unlikely
+	// to be accepted as a requestor. Private profiles do not personal information.
 
 	return prisma.userToActivities.create({
 		data: {
