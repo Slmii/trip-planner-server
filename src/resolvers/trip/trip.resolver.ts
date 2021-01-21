@@ -18,7 +18,8 @@ export class TripResolver {
 	 */
 
 	@FieldResolver(type => Number, {
-		description: 'Return userId if current user is the creator of the trip. We do not want to expose personal fields'
+		description:
+			'Return userId if current user is the creator of the trip. We do not want to expose personal fields'
 	})
 	userId(@Root() trip: Trip, @UserDecorator() currentUser: CurrentUser) {
 		const { userId } = currentUser;
@@ -184,7 +185,11 @@ export class TripResolver {
 
 	@Authorized()
 	@Mutation(type => Trip)
-	editTrip(@Arg('tripId', type => Int) tripId: number, @Arg('data') data: AddTripInput, @UserDecorator() { userId }: CurrentUser) {
+	editTrip(
+		@Arg('tripId', type => Int) tripId: number,
+		@Arg('data') data: AddTripInput,
+		@UserDecorator() { userId }: CurrentUser
+	) {
 		return TripService.edit({
 			tripId,
 			userId,

@@ -116,6 +116,18 @@ export const getUserActivity = (activityId: number, userId: number) => {
 };
 
 /**
+ * Get an activity.
+ * @param  {number} activityId
+ */
+export const getActivity = (activityId: number) => {
+	return prisma.activity.findUnique({
+		where: {
+			id: activityId
+		}
+	});
+};
+
+/**
  * Get all current user's public and private activities.
  * @param  {number} userId
  */

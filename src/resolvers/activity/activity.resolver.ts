@@ -28,7 +28,7 @@ export class ActivityResolver {
 	}
 
 	@FieldResolver(type => [UserType], {
-		description: 'Fetch all users who joined/invited the activity'
+		description: 'Fetch all users who joined the activity'
 	})
 	async users(@Root() activity: Activity, @Ctx() { loaders }: Context) {
 		return loaders.usersToActivities.load(activity.id);

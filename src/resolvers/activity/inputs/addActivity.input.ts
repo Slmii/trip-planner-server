@@ -6,7 +6,8 @@ import {
     IsPositive,
     Min,
     MinDate,
-    MinLength
+    MinLength,
+    ValidateIf
 } from 'class-validator';
 import { Field, InputType, Int } from 'type-graphql';
 
@@ -52,12 +53,13 @@ export class AddActivityInput {
 	@IsBoolean()
 	public!: boolean;
 
-	@Field(type => Int)
+	@Field(type => Int, { nullable: true })
+	@ValidateIf(o => o.public)
 	@Min(1)
 	@IsDefined({
 		message: 'Provide a number of max people who can join'
 	})
-	maxPeople!: number;
+	maxPeople?: number;
 
 	@Field(type => Int)
 	@IsPositive()

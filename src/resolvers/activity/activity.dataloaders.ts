@@ -26,9 +26,6 @@ export const createUsersToActivitiesLoader = () =>
 			where: {
 				activityId: {
 					in: activityIds as number[]
-				},
-				user: {
-					public: true
 				}
 			},
 			include: {

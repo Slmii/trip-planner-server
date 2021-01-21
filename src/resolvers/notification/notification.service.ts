@@ -6,14 +6,15 @@ import { TripService } from '../trip';
 
 /**
  * Add a notification linked to the receiver.
- * senderUserId is the userId of the current user.
- * @param  {AddNotificationInput & { senderUserId}} data
+ * senderUserId is the userId of the current user (the one who is responsible
+ * for the creation of the notification).
+ * @param  {AddNotificationInput & { senderUserId }} data
  */
 export const add = async (data: AddNotificationInput & { senderUserId: number }) => {
 	const { type, senderUserId, receiverUserId, resourceId } = data;
 
-	const isActivity = helpers.isActivityNotification(type);
-	const isTrip = helpers.isTripNotification(type);
+	const isActivityNotification = helpers.isActivityNotification(type);
+	const isTripNotification = helpers.isTripNotification(type);
 
 	const notification = await prisma.notification.create({
 		data: {
@@ -25,8 +26,12 @@ export const add = async (data: AddNotificationInput & { senderUserId: number })
 		}
 	});
 
-	if (isActivity) {
-		const activity = await ActivityService.getPublicActivity(resourceId);
+	// Activity does not need to be private. Notification includes:
+	// 1. request to join an activity
+	// 2. invitation to join an activity
+	// 3. upcoming activity
+	if (isActivityNotification) {
+		const activity = await ActivityService.getActivity(resourceId);
 
 		if (!activity) {
 			throw errors.notFound;
@@ -40,10 +45,11 @@ export const add = async (data: AddNotificationInput & { senderUserId: number })
 		});
 	}
 
-	if (isTrip) {
+	// TODO: make sharing and managing Trips available in the future with multiple people
+	// For now this notification only includes 'upcoming trip'
+	if (isTripNotification) {
 		const trip = await TripService.getTrip({
-			id: resourceId,
-			public: true
+			id: resourceId
 		});
 
 		if (!trip) {

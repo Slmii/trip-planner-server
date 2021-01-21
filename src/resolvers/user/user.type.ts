@@ -6,16 +6,16 @@ import { Role } from '../user';
 
 @ObjectType()
 export class User extends DefaultTypes {
-	@Field()
+	@Field({ nullable: true })
 	email!: string;
 
-	@Field()
+	@Field({ nullable: true })
 	firstName!: string;
 
-	@Field()
+	@Field({ nullable: true })
 	lastName!: string;
 
-	@Field(type => String)
+	@Field(type => String, { nullable: true })
 	get name(): string {
 		return `${this.firstName} ${this.lastName}`;
 	}

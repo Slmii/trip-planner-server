@@ -22,7 +22,7 @@ export class NotificationResolver {
 	}
 
 	@FieldResolver(type => Activity, {
-		description: 'Fetch the related public activity of the notification'
+		description: 'Fetch the related activity of the notification'
 	})
 	async activity(@Root() notification: Notification) {
 		const notificationToTrip = await prisma.notificationToActivities.findUnique({
@@ -41,7 +41,7 @@ export class NotificationResolver {
 	}
 
 	@FieldResolver(type => Activity, {
-		description: 'Fetch the related public trip of the notification'
+		description: 'Fetch the related trip of the notification'
 	})
 	async trip(@Root() notification: Notification) {
 		const notificationToTrip = await prisma.notificationToTrips.findUnique({

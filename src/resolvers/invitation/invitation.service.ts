@@ -44,17 +44,23 @@ const add = async (data: AddSingleInvitation) => {
 
 /**
  * Add more than 1 invitation. Only available of the current user is the
- * creator of the activity and the trip and activity is public. Invitations
- * can be sent as long as the amount of people that have joined does not
- * exceed `maxPeople`
+ * creator of the activity. Invitations can be sent as long as the amount
+ * of people that have joined does not exceed `maxPeople`
  * @param  {Input.AddInvitationInput & { userId: number }} data
  */
 const addMany = async (data: AddInvitationInput & { userId: number }) => {
 	const { emails, activityId, userId } = data;
 
+	const senderUser = await UserService.user(userId);
+
+	// Only users with a public profile are allowed to send out invitations
+	if (!senderUser?.public) {
+		throw errors.notAuthorized;
+	}
+
 	const activity = await ActivityService.getUserActivity(activityId, userId);
 
-	if (!activity || !activity.public) {
+	if (!activity) {
 		throw errors.notFound;
 	}
 
