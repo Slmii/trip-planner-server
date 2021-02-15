@@ -15,7 +15,7 @@ export class FavoriteResolver {
 	 */
 
 	@FieldResolver(type => UserType, {
-		description: 'Fetch the related Trip of the Favorite'
+		description: 'Fetch the related User of Favorite'
 	})
 	user(@Root() favorite: Favorite) {
 		return UserService.user(favorite.userId);

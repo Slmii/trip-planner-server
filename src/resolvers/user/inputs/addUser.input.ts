@@ -1,4 +1,4 @@
-import { IsAlpha, IsBoolean, IsEmail, IsEnum, MinLength, ValidateIf } from 'class-validator';
+import { IsAlpha, IsBoolean, IsDate, IsEmail, IsEnum, MinLength, ValidateIf } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 import { Match } from '../../../common/decorators';
@@ -23,6 +23,12 @@ export class AddUserInput {
 		message: 'Last name can only contain alpha characters'
 	})
 	lastName!: string;
+
+	@Field()
+	@IsDate({
+		message: 'Provide a valid date of birth'
+	})
+	dateOfBirth!: Date;
 
 	@Field()
 	@MinLength(5, {

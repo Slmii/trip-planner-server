@@ -43,7 +43,7 @@ const add = async (data: AddSingleInvitation) => {
 };
 
 /**
- * Add more than 1 invitation. Only available of the current user is the
+ * Add and send more than 1 invitation. Only available of the current user is the
  * creator of the activity. Invitations can be sent as long as the amount
  * of people that have joined does not exceed `maxPeople`
  * @param  {Input.AddInvitationInput & { userId: number }} data
@@ -53,7 +53,7 @@ const addMany = async (data: AddInvitationInput & { userId: number }) => {
 
 	const senderUser = await UserService.user(userId);
 
-	// Only users with a public profile are allowed to send out invitations
+	// ! Only users with a public profile are allowed to send out invitations
 	if (!senderUser?.public) {
 		throw errors.notAuthorized;
 	}
@@ -87,7 +87,7 @@ const addMany = async (data: AddInvitationInput & { userId: number }) => {
 			receiverUserId: receiverUser?.id
 		});
 
-		// Add a notification if the user has an account
+		// Add a notification if the received user has an existing account
 		if (receiverUser) {
 			await NotificationService.add({
 				receiverUserId: receiverUser.id,

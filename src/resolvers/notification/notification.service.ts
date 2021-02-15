@@ -46,7 +46,6 @@ export const add = async (data: AddNotificationInput & { senderUserId: number })
 	}
 
 	// TODO: make sharing and managing Trips available in the future with multiple people
-	// For now this notification only includes 'upcoming trip'
 	if (isTripNotification) {
 		const trip = await TripService.getTrip({
 			id: resourceId

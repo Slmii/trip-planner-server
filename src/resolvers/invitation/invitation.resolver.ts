@@ -21,12 +21,10 @@ export class InvitationResolver {
 		return ActivityService.getPublicActivity(invitation.activityId);
 	}
 
-	@FieldResolver(type => UserType, {
-		nullable: true
-	})
-	user(@Root() invitation: Invitation) {
-		return UserService.findUserByEmail(invitation.email);
-	}
+	// @FieldResolver(type => UserType)
+	// user(@Root() invitation: Invitation) {
+	// 	return UserService.findUserByEmail(invitation.email);
+	// }
 
 	/*
 	 * End Field Resolvers

@@ -22,8 +22,8 @@ export class Invitation extends DefaultTypes {
 	@Field(type => Activity, { nullable: true })
 	activity?: Activity;
 
-	@Field(type => User, { nullable: true })
-	user?: User;
+	// @Field(type => User)
+	// user!: User;
 }
 
 @ObjectType()

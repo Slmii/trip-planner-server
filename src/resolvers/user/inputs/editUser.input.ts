@@ -1,4 +1,4 @@
-import { IsAlpha, IsEmail } from 'class-validator';
+import { IsAlpha, IsDate, IsEmail } from 'class-validator';
 import { Field, InputType } from 'type-graphql';
 
 @InputType()
@@ -20,4 +20,10 @@ export class EditUserInput {
 		message: 'Last name can only contain alpha characters'
 	})
 	lastName!: string;
+
+	@Field()
+	@IsDate({
+		message: 'Provide a valid date of birth'
+	})
+	dateOfBirth!: Date;
 }

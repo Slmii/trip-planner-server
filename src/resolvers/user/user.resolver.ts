@@ -29,95 +29,113 @@ export class UserResolver {
 		return loaders.trip.load(user.id);
 	}
 
-	@FieldResolver(type => String, {
-		nullable: true,
-		description: 'If User has a private profile then do not expose email address to others'
-	})
-	email(@Root() user: UserType, @User() { userId }: CurrentUser) {
-		if (user.public) {
-			return user.email;
-		}
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose email address to others'
+	// })
+	// email(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return user.email;
+	// 	}
 
-		// User has a private profile.
-		// Only available for current user
-		if (helpers.isCreator(user.id, userId)) {
-			return user.email;
-		}
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return user.email;
+	// 	}
 
-		return null;
-	}
+	// 	return null;
+	// }
 
-	@FieldResolver(type => String, {
-		nullable: true,
-		description: 'If User has a private profile then do not expose first name to others'
-	})
-	firstName(@Root() user: UserType, @User() { userId }: CurrentUser) {
-		if (user.public) {
-			return user.firstName;
-		}
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose first name to others'
+	// })
+	// firstName(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return user.firstName;
+	// 	}
 
-		// User has a private profile.
-		// Only available for current user
-		if (helpers.isCreator(user.id, userId)) {
-			return user.firstName;
-		}
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return user.firstName;
+	// 	}
 
-		return null;
-	}
+	// 	return null;
+	// }
 
-	@FieldResolver(type => String, {
-		nullable: true,
-		description: 'If User has a private profile then do not expose last name to others'
-	})
-	lastName(@Root() user: UserType, @User() { userId }: CurrentUser) {
-		if (user.public) {
-			return user.lastName;
-		}
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose last name to others'
+	// })
+	// lastName(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return user.lastName;
+	// 	}
 
-		// User has a private profile.
-		// Only available for current user
-		if (helpers.isCreator(user.id, userId)) {
-			return user.lastName;
-		}
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return user.lastName;
+	// 	}
 
-		return null;
-	}
+	// 	return null;
+	// }
 
-	@FieldResolver(type => String, {
-		nullable: true,
-		description: 'If User has a private profile then do not expose full name to others'
-	})
-	name(@Root() user: UserType, @User() { userId }: CurrentUser) {
-		if (user.public) {
-			return `${user.firstName} ${user.lastName}`;
-		}
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose full name to others'
+	// })
+	// name(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return `${user.firstName} ${user.lastName}`;
+	// 	}
 
-		// User has a private profile.
-		// Only available for current user
-		if (helpers.isCreator(user.id, userId)) {
-			return `${user.firstName} ${user.lastName}`;
-		}
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return `${user.firstName} ${user.lastName}`;
+	// 	}
 
-		return null;
-	}
+	// 	return null;
+	// }
 
-	@FieldResolver(type => String, {
-		nullable: true,
-		description: 'If User has a private profile then do not expose profile img to others'
-	})
-	profileImgUrl(@Root() user: UserType, @User() { userId }: CurrentUser) {
-		if (user.public) {
-			return user.profileImgUrl;
-		}
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose profile img to others'
+	// })
+	// profileImgUrl(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return user.profileImgUrl;
+	// 	}
 
-		// User has a private profile.
-		// Only available for current user
-		if (helpers.isCreator(user.id, userId)) {
-			return user.profileImgUrl;
-		}
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return user.profileImgUrl;
+	// 	}
 
-		return null;
-	}
+	// 	return null;
+	// }
+
+	// @FieldResolver(type => String, {
+	// 	nullable: true,
+	// 	description: 'If User has a private profile then do not expose date of birth to others'
+	// })
+	// dateOfBirth(@Root() user: UserType, @User() { userId }: CurrentUser) {
+	// 	if (user.public) {
+	// 		return user.dateOfBirth;
+	// 	}
+
+	// 	// User has a private profile.
+	// 	// Only available for current user
+	// 	if (helpers.isCreator(user.id, userId)) {
+	// 		return user.dateOfBirth;
+	// 	}
+
+	// 	return null;
+	// }
 
 	/*
 	 * End Field Resolvers

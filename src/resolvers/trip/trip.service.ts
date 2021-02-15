@@ -8,14 +8,21 @@ import { PreparationService } from '../preparation';
 import { SharedService } from '../shared';
 import { SubPreparationService } from '../subPreparation';
 import { AddTripInput, TripSortByInput, TripWhereInput } from '../trip/inputs';
+import { UserService } from '../user/user.service';
 
-export const add = (params: { userId: number; data: AddTripInput }) => {
+export const add = async (params: { userId: number; data: AddTripInput }) => {
 	const {
 		userId,
 		data: { locations, activities, preparations, ...trip }
 	} = params;
 
-	// TODO: if trip is private than no public activities are allowed
+	// Private trip cannot have public activities
+	// if (!trip.public && activities?.some(activity => activity.public)) {}
+
+	// Private profile user cannot create a public trip or public activities
+	// const user = await UserService.user(userId);
+	// if (!user?.public && trip.public && activities?.some(activity => activity.public)) {}
+
 	const createActivities: Prisma.ActivityCreateInput[] | undefined = activities?.map(
 		({
 			name,

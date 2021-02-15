@@ -51,7 +51,7 @@ export const UserService = {
 			take: pagination?.take
 		});
 	},
-	add: async ({ email, firstName, lastName, password, invitationToken }: SignUpUser) => {
+	add: async ({ email, firstName, lastName, password, invitationToken, dateOfBirth }: SignUpUser) => {
 		const user = await UserService.findUserByEmail(email);
 
 		if (user) {
@@ -63,17 +63,19 @@ export const UserService = {
 				email: email.toLowerCase(),
 				firstName,
 				lastName,
+				dateOfBirth,
 				password: await helpers.hashPassword(password)
 			}
 		});
 
 		// Add invitation and notification to the new user
 		if (invitationToken) {
+			// Find invitation by invitationToken
 			const invitation = await InvitationService.validate(invitationToken);
 
+			// Invitation exists
 			if (invitation) {
-				// Add the invitation to the new user
-				// so that it will be available in his 'received invitations' list
+				// Add invitation to 'received invitations' list for new created user
 				await prisma.userToReceivedInvitations.create({
 					data: {
 						invitationId: invitation.id,
@@ -88,22 +90,20 @@ export const UserService = {
 					}
 				});
 
-				// Add a notification that the new user has received an invitation
-				// from the sender
-				if (invitationSender) {
-					await NotificationService.add({
-						receiverUserId: newUser.id,
-						resourceId: invitation.activityId!,
-						senderUserId: invitationSender.userId,
-						type: NotificationType.ACTIVITY_INVITATION_SENT
-					});
-				}
+				// Add notification of a received invitation for the new created user
+				await NotificationService.add({
+					receiverUserId: newUser.id,
+					resourceId: invitation.activityId!,
+					// invitationSender 100% exists
+					senderUserId: invitationSender!.userId,
+					type: NotificationType.ACTIVITY_INVITATION_SENT
+				});
 			}
 		}
 
 		return newUser;
 	},
-	edit: async (userId: number, data: EditUserInput | undefined) => {
+	edit: async (userId: number, data: Partial<EditUserInput>) => {
 		const user = await prisma.user.findUnique({
 			where: {
 				id: userId
@@ -120,8 +120,9 @@ export const UserService = {
 			},
 			data: {
 				email: data?.email?.toLowerCase(),
-				firstName: data?.firstName,
-				lastName: data?.lastName
+				firstName: data.firstName,
+				dateOfBirth: data.dateOfBirth,
+				lastName: data.lastName
 			}
 		});
 

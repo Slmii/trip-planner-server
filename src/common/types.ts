@@ -47,6 +47,7 @@ export interface SignUpUser {
 	firstName: string;
 	lastName: string;
 	password: string;
+	dateOfBirth: Date;
 	invitationToken?: string;
 }
 

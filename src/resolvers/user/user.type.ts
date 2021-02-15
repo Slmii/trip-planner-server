@@ -6,16 +6,16 @@ import { Role } from '../user';
 
 @ObjectType()
 export class User extends DefaultTypes {
-	@Field({ nullable: true })
+	@Field()
 	email!: string;
 
-	@Field({ nullable: true })
+	@Field()
 	firstName!: string;
 
-	@Field({ nullable: true })
+	@Field()
 	lastName!: string;
 
-	@Field(type => String, { nullable: true })
+	@Field(type => String)
 	get name(): string {
 		return `${this.firstName} ${this.lastName}`;
 	}
@@ -35,8 +35,11 @@ export class User extends DefaultTypes {
 	@Field()
 	public!: boolean;
 
-	@Field({ nullable: true })
+	@Field()
 	profileImgUrl?: string;
+
+	@Field()
+	dateOfBirth?: Date;
 
 	@Field(type => [Trip])
 	trips!: Trip[];

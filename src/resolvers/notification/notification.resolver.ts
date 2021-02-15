@@ -18,6 +18,7 @@ export class NotificationResolver {
 		description: 'Fetch the user who send the notification'
 	})
 	sender(@Root() notification: Notification) {
+		// This is always a user with a public profile
 		return UserService.user(notification.senderUserId);
 	}
 
